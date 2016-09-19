@@ -1,0 +1,3692 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Symbol IsArchivable="no" IsPlaceable="no" MainGUID="431E8D26-C0AE-4C7E-8D1A-FDDC05518D98" MigrationValue="Normal" Owner="1196638531" Signature="1196644685" Version="34">
+<Ancestry SectVersion="1" SectionFlags="0" SubIdent="0" Template="no">
+	<MainGUID>F938E33A-329D-4A36-BE3E-85E126820996</MainGUID>
+	<MainGUID>103E8D2C-8230-42E1-9597-46F84CCE28C0</MainGUID>
+	<MainGUID>B2970E4C-8680-4061-8670-2F4B638F3953</MainGUID>
+</Ancestry>
+
+<CalledMacros SectVersion="2" SectionFlags="0" SubIdent="0">
+</CalledMacros>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_3D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ==============================================================================
+!
+! Anyagparaméterek
+!
+! ==============================================================================
+
+if matNumber > 0 and matNumber <= VARDIM1(sMatName) then
+	! ------------------------------------------------------------------------------
+	! Nem definiált specular color
+	! ------------------------------------------------------------------------------
+	if sRGB[matNumber][1] < EPS then
+		sRGB[matNumber][1] = cRGB[matNumber][1]
+		sRGB[matNumber][2] = cRGB[matNumber][2]
+		sRGB[matNumber][3] = cRGB[matNumber][3]
+	endif
+
+	! ------------------------------------------------------------------------------
+	! Színtömbök
+	! ------------------------------------------------------------------------------
+	dim cCode[3]
+	dim sCode[3]
+	cCode[1] = cRGB[matNumber][1]
+	cCode[2] = cRGB[matNumber][2]
+	cCode[3] = cRGB[matNumber][3]
+
+	sCode[1] = sRGB[matNumber][1]
+	sCode[2] = sRGB[matNumber][2]
+	sCode[3] = sRGB[matNumber][3]
+
+	texName = sTexName[matNumber]
+	matName = sMatName[matNumber]
+	
+	! ------------------------------------------------------------------------------
+	! Állandó értékek
+	! ------------------------------------------------------------------------------
+
+		amb		= 0.78			! Textile
+		diff	= 0.9
+		spect	= 0.0
+		trans	= 0.0
+		shin	= 1.0
+		tatte	= 1.0
+		eatte	= 0.0
+		LWA_amb		= 0.860
+		LWA_diff	= 0.810
+
+	if matNumber < 13 then		! Leather
+		amb		= 0.86
+		diff	= 0.81
+		spect	= 0.1
+		trans	= 0.0
+		shin	= 2.2
+		tatte	= 0.0
+		eatte	= 0.0
+		LWA_amb		= 0.860
+		LWA_diff	= 0.810
+	endif
+
+	if matNumber > 158 and matNumber < 198 then		! Plastic
+		amb		= 0.7
+		diff	= 0.96
+		spect	= 0.5
+		trans	= 0.0
+		shin	= 15.2
+		tatte	= 0.0
+		eatte	= 0.0
+		LWA_amb		= 0.1
+		LWA_diff	= 1
+	endif
+
+	if matNumber > 197 and matNumber < 216 then		! Wood and Laminat
+		amb		= 0.86
+		diff	= 0.81
+		spect	= 0.1
+		trans	= 0.0
+		shin	= 2.2
+		tatte	= 0.0
+		eatte	= 0.0
+		LWA_amb		= 0.860
+		LWA_diff	= 0.810
+	endif
+
+	if matNumber > 215 then		! Steel
+		amb		= 0.9
+		diff	= 0.5
+		spect	= 0.95
+		trans	= 0
+		shin	= 74.4
+		tatte	= 0
+		eatte	= 0.0
+		LWA_amb		= 0.240
+		LWA_diff	= 0.107
+	endif
+
+	if matNumber = 220 then		! Glass
+		amb		= 0.8
+		diff	= 0.7
+		spect	= 0.5
+		trans	= 0.85
+		shin	= 92
+		tatte	= 0.5
+		eatte	= 0.0
+		LWA_amb		= 0.240
+		LWA_diff	= 0.107
+	endif
+
+	end matName,texName,
+		cCode, sCode, amb, diff, spect, trans, shin, tatte, eatte,
+		LWA_amb, LWA_diff
+endif
+
+]]>
+</Script_3D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_2D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_2D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_1D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------------------
+! Variables
+! ------------------------------------------------------------------------------
+eps = 0.0001
+
+! ------------------------------------------------------------------------------
+! Localization
+! ------------------------------------------------------------------------------
+
+dim stMaterialUI[]
+	stMaterialUI[1]		= `Custom Material`
+	stMaterialUI[2]		= `Back Material`
+	stMaterialUI[3]		= `Seat Material`
+	stMaterialUI[4]		= `Armrest Material`
+	stMaterialUI[5]		= `Wood Material`
+	stMaterialUI[6]		= `Steel Material`
+	stMaterialUI[7]		= `Upholstery Type`
+	stMaterialUI[8]		= `Leather Type`
+	stMaterialUI[9]		= `Textile Type`
+	stMaterialUI[10]	= `Upholstery Material`
+	stMaterialUI[11]	= `Plastic Material`
+
+dim stUpholsteryType[]
+	stUpholsteryType[1]	= `Leather`
+	stUpholsteryType[2]	= `Textile`
+
+dim stLeatherType[]
+	stLeatherType[1]	= `Grain`
+	stLeatherType[2]	= `Flor`
+
+dim stTextileType[]
+	stTextileType[1]	= `Frida`
+	stTextileType[2]	= `Lucia`
+	stTextileType[3]	= `Buco`
+	stTextileType[4]	= `Vikingfjord`
+	stTextileType[5]	= `Smarty Plus`
+	stTextileType[6]	= `Gaja`
+	stTextileType[7]	= `Camira Halycon 1`
+	stTextileType[8]	= `Camira Halycon 2`
+	stTextileType[9]	= `Camira Halycon 3`
+	stTextileType[10]	= `24/7`
+	stTextileType[11]	= `Bloom Cyber`
+	stTextileType[12]	= `Bloom Scoop`
+
+dim stPlasticType[]
+	stPlasticType[1]	= `R-45 or R-48`
+	stPlasticType[2]	= `Coda`
+	stPlasticType[3]	= `Rio or Samba`
+	stPlasticType[4]	= `Samba or Rio Jr or Mini`
+	stPlasticType[5]	= `Moon`
+	stPlasticType[6]	= `Public`
+
+! ==============================================================================
+! ncp_materials
+! ------------------------------------------------------------------------------
+! Ez a makró adja vissza az anyagokat
+! ------------------------------------------------------------------------------
+! Bemenö adatok:
+
+!	ElementType:
+!	iElementType:						Elem típusa
+		ELEMENT_CHAIR		= 1			!Szék
+		ELEMENT_SOFA		= 2			!Kanapé
+		ELEMENT_TABLE		= 3			!Asztal
+
+!	Type:
+!	iType:								Típus
+		TYPE_CODA			= 1			!Coda
+		TYPE_PUBLIC			= 2			!Public
+		TYPE_PUBLICBARSTOL	= 3			!Public Barstool
+		TYPE_RIO			= 4			!Rio
+		TYPE_RIOBARSTOL		= 5			!Rio Barstool
+		TYPE_RIOMINI		= 6			!Rio Z Junior og Mini
+		TYPE_RIOJUNIOR		= 7			!Rio Junior
+		TYPE_R48			= 8			!R-48
+		TYPE_FAVN			= 9			!Favn
+
+		TYPE_SAMBA			= 21		!Samba 
+		TYPE_SAMBAJUNIOR	= 22		!Samba junior
+
+		TYPE_R60C			= 31		!R-60c table
+		TYPE_NORDICLIGHT	= 32 		!Nordic Light table
+		TYPE_HUB			= 33 		!HUB table
+		TYPE_R80			= 34 		!R-80 table
+		TYPE_R100 			= 35 		!R-100 table
+
+! ------------------------------------------------------------------------------
+! Options
+! ------------------------------------------------------------------------------
+
+!	LegType:
+!	iLegType:							Láb típusa
+		NORMAL_LEG			= 1			!Kerék nélküli
+		OFFICE_LEG			= 2			!Kerekes
+
+!	ChairType
+!	iChairType
+		CHAIR_TYPE1			= 1 		! 1
+		CHAIR_TYPE2			= 2 		! 2
+		CHAIR_TYPE3			= 3 		! 3
+		CHAIR_TYPE4			= 4 		! 4
+
+!	SeatPadding
+!	iSeatPadding
+		SEATPAD_WO			= 1 		!Without Upholstery
+		SEATPAD_SEAT		= 2 		!Seat Upholstered
+		SEATPAD_BACK		= 3 		!Back Upholstered
+
+!	BackType
+!	iBackType
+		HIGH_BACK			= 1 		!High Back
+		LOW_BACK			= 2 		!Low Back
+
+!	Linking
+!	iLinking
+		LINKING_ON			= 1 		!Enabled
+		LINKING_OFF			= 2 		!Disabled
+
+!	Armrest
+!	iArmrest
+		ARMREST_ON			= 1 		!Enabled
+		ARMREST_OFF			= 2 		!Disabled
+
+!	FeetType:
+!	iFeetType:
+		FEET_STEEL			= 1 		!Steel
+		FEET_WOOD			= 2 		!Wood
+
+!	FeetHolder:
+!	iFeetHolder:
+		FEET_ON				= 1 		!Enabled
+		FEET_OFF			= 2 		!Disabled
+
+! ------------------------------------------------------------------------------
+! Materials
+! ------------------------------------------------------------------------------
+	
+!	UpholsteryType:
+!	iUpholsteryType:
+		UPHOLSTERY_LEATHER	= 1 		!Leather
+		UPHOLSTERY_TEXTILE	= 2 		!Textil
+
+!	LeatherType:
+!	iLeatherType:
+		LEATHER_GRAIN		= 1 		!Grain
+		LEATHER_FLOR		= 2 		!Flor
+
+!	TextileType:
+!	iTextileType:
+		TEXTILE_FRIDA		= 1 		!Frida
+		TEXTILE_LUCIA		= 2 		!Lucia
+		TEXTILE_BUCO		= 3 		!Buco
+		TEXTILE_VIKINGFJORD	= 4			!Vikingfjord
+		TEXTILE_SMARTYPLUS	= 5			!Smarty Plus
+		TEXTILE_GAJA		= 6			!Gaja
+		TEXTILE_HALYCON1	= 7			!Camira Halycon 1
+		TEXTILE_HALYCON2	= 8			!Camira Halycon 2
+		TEXTILE_HALYCON3	= 9			!Camira Halycon 3
+		TEXTILE_247			= 10		!24/7
+		TEXTILE_BLOOMCYBER	= 11		!Bloom Cyber
+		TEXTILE_BLOOMSCOOP	= 12		!Bloom Scoop
+
+!	PlasticType:
+!	iPlasticType:
+		PLASTIC_R48			= 1 		!R-45 or R-48
+		PLASTIC_CODA		= 2 		!Coda
+		PLASTIC_RIO			= 3 		!Rio or Samba
+		PLASTIC_RIOJR		= 4 		!Samba or Rio Jr or Mini 
+		PLASTIC_MOON		= 5 		!Moon
+		PLASTIC_PUBLIC		= 6 		!Public
+
+!!Kimenő adatok	
+
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+! ==============================================================================
+
+
+
+! ==============================================================================
+
+dim tempArray[]
+dim sMatName[]
+dim sTexName[]
+dim cRGB[][]
+dim sRGB[][]
+
+i=1
+
+!!Leather - Grain
+sMatName[i]=`07`				:cRGB[i][1]=205/255	:cRGB[i][2]=177/255	:cRGB[i][3]=154/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_07"					:i=i+1	! #1
+sMatName[i]=`20`				:cRGB[i][1]=79/255	:cRGB[i][2]=51/255	:cRGB[i][3]=49/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_20"					:i=i+1	! #2
+sMatName[i]=`69`				:cRGB[i][1]=37/255	:cRGB[i][2]=43/255	:cRGB[i][3]=70/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_69"					:i=i+1	! #3
+sMatName[i]=`42`				:cRGB[i][1]=186/255	:cRGB[i][2]=171/255	:cRGB[i][3]=32/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_42"					:i=i+1	! #4
+sMatName[i]=`90`				:cRGB[i][1]=29/255	:cRGB[i][2]=28/255	:cRGB[i][3]=31/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_90"					:i=i+1	! #5
+sMatName[i]=`29`				:cRGB[i][1]=210/255	:cRGB[i][2]=33/255	:cRGB[i][3]=46/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Grain_29"					:i=i+1	! #6
+
+!!Leather - Flor
+sMatName[i]=`605`				:cRGB[i][1]=230/255	:cRGB[i][2]=198/255	:cRGB[i][3]=166/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_605"					:i=i+1	! #7
+sMatName[i]=`520 MT`			:cRGB[i][1]=99/255	:cRGB[i][2]=63/255	:cRGB[i][3]=60/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_520_MT"				:i=i+1	! #8
+sMatName[i]=`527 MT`			:cRGB[i][1]=60/255	:cRGB[i][2]=40/255	:cRGB[i][3]=64/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_527_MT"				:i=i+1	! #9
+sMatName[i]=`501 MT`			:cRGB[i][1]=208/255	:cRGB[i][2]=203/255	:cRGB[i][3]=196/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_501_MT"				:i=i+1	! #10
+sMatName[i]=`580 MT`			:cRGB[i][1]=69/255	:cRGB[i][2]=65/255	:cRGB[i][3]=66/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_580_MT"				:i=i+1	! #11
+sMatName[i]=`525 MT`			:cRGB[i][1]=146/255	:cRGB[i][2]=47/255	:cRGB[i][3]=53/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Flor_525_MT"				:i=i+1	! #12
+
+!!Textile - Frida
+textileStart = 13		!! Az UI miatt kell (képek számozása)
+sMatName[i]=`Burgunder NP 001`	:cRGB[i][1]=148/255	:cRGB[i][2]=37/255	:cRGB[i][3]=42/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Frida_Burgunder_NP_001"	:i=i+1	! #13
+sMatName[i]=`Sort NP 003`		:cRGB[i][1]=76/255	:cRGB[i][2]=64/255	:cRGB[i][3]=56/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Frida_Sort_NP_003"		:i=i+1	! #14
+sMatName[i]=`Bla NP 002`		:cRGB[i][1]=75/255	:cRGB[i][2]=82/255	:cRGB[i][3]=114/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Frida_Bla_NP_002"			:i=i+1	! #15
+sMatName[i]=`Gra NP 005`		:cRGB[i][1]=127/255	:cRGB[i][2]=114/255	:cRGB[i][3]=109/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Frida_Gra_NP_005"			:i=i+1	! #16
+
+!!Textile - Lucia
+sMatName[i]=`Jamaica YB 027`	:cRGB[i][1]=160/255	:cRGB[i][2]=61/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Jamaica_YB_027"		:i=i+1	! #17
+sMatName[i]=`Calypso YB106`		:cRGB[i][1]=185/255	:cRGB[i][2]=8/255	:cRGB[i][3]=17/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Calypso_YB106"		:i=i+1	! #18
+sMatName[i]=`Tobago YB030`		:cRGB[i][1]=126/255	:cRGB[i][2]=15/255	:cRGB[i][3]=31/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Tobago_YB030"		:i=i+1	! #19
+sMatName[i]=`Curaco YB005`		:cRGB[i][1]=48/255	:cRGB[i][2]=90/255	:cRGB[i][3]=145/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Curaco_YB005"		:i=i+1	! #20
+sMatName[i]=`Caribean YB020`	:cRGB[i][1]=58/255	:cRGB[i][2]=70/255	:cRGB[i][3]=105/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Caribean_YB020"		:i=i+1	! #21
+sMatName[i]=`Taboo YB045`		:cRGB[i][1]=45/255	:cRGB[i][2]=105/255	:cRGB[i][3]=84/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Taboo_YB045"		:i=i+1	! #22
+sMatName[i]=`Slip YB094`		:cRGB[i][1]=30/255	:cRGB[i][2]=60/255	:cRGB[i][3]=48/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Slip_YB094"			:i=i+1	! #23
+sMatName[i]=`Costa YB026`		:cRGB[i][1]=158/255	:cRGB[i][2]=148/255	:cRGB[i][3]=148/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Costa_YB026"		:i=i+1	! #24
+sMatName[i]=`Havana YB009`		:cRGB[i][1]=68/255	:cRGB[i][2]=54/255	:cRGB[i][3]=54/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Lucia_Havana_YB009"		:i=i+1	! #25
+
+!!Textile - Buco
+sMatName[i]=`8711`				:cRGB[i][1]=155/255	:cRGB[i][2]=139/255	:cRGB[i][3]=77/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8711"				:i=i+1	! #26
+sMatName[i]=`8911`				:cRGB[i][1]=72/255	:cRGB[i][2]=68/255	:cRGB[i][3]=69/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8911"				:i=i+1	! #27
+sMatName[i]=`8067`				:cRGB[i][1]=141/255	:cRGB[i][2]=123/255	:cRGB[i][3]=110/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8067"				:i=i+1	! #28
+sMatName[i]=`8811`				:cRGB[i][1]=80/255	:cRGB[i][2]=51/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8811"				:i=i+1	! #29
+sMatName[i]=`8941`				:cRGB[i][1]=197/255	:cRGB[i][2]=102/255	:cRGB[i][3]=51/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8941"				:i=i+1	! #30
+sMatName[i]=`8421`				:cRGB[i][1]=36/255	:cRGB[i][2]=47/255	:cRGB[i][3]=65/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8421"				:i=i+1	! #31
+sMatName[i]=`8034`				:cRGB[i][1]=85/255	:cRGB[i][2]=104/255	:cRGB[i][3]=126/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8034"				:i=i+1	! #32
+sMatName[i]=`8006`				:cRGB[i][1]=165/255	:cRGB[i][2]=17/255	:cRGB[i][3]=27/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8006"				:i=i+1	! #33
+sMatName[i]=`8033`				:cRGB[i][1]=179/255	:cRGB[i][2]=27/255	:cRGB[i][3]=29/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Buco_8033"				:i=i+1	! #34
+
+!!Textile - Vikingfjord
+sMatName[i]=`6023521 brun`		:cRGB[i][1]=73/255	:cRGB[i][2]=50/255	:cRGB[i][3]=48/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023521_brun"			:i=i+1	! #35
+sMatName[i]=`6023531 naturell`	:cRGB[i][1]=165/255	:cRGB[i][2]=145/255	:cRGB[i][3]=130/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023531_naturell"		:i=i+1	! #36
+sMatName[i]=`6023523 beige`		:cRGB[i][1]=206/255	:cRGB[i][2]=180/255	:cRGB[i][3]=151/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023523_beige"		:i=i+1	! #37
+sMatName[i]=`6023535 lys gra`	:cRGB[i][1]=160/255	:cRGB[i][2]=155/255	:cRGB[i][3]=142/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023535_lys_gra"		:i=i+1	! #38
+sMatName[i]=`6023522 petrol`	:cRGB[i][1]=57/255	:cRGB[i][2]=104/255	:cRGB[i][3]=103/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023522_petrol"		:i=i+1	! #39
+sMatName[i]=`6023534 mork beige`:cRGB[i][1]=160/255	:cRGB[i][2]=129/255	:cRGB[i][3]=109/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023534_mork_beige"	:i=i+1	! #40
+sMatName[i]=`6023525 rosa`		:cRGB[i][1]=178/255	:cRGB[i][2]=41/255	:cRGB[i][3]=78/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023525_rosa"			:i=i+1	! #41
+sMatName[i]=`6023529 gronn`		:cRGB[i][1]=168/255	:cRGB[i][2]=137/255	:cRGB[i][3]=18/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023529_gronn"		:i=i+1	! #42
+sMatName[i]=`6023533 rod`		:cRGB[i][1]=134/255	:cRGB[i][2]=8/255	:cRGB[i][3]=19/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023533_rod"			:i=i+1	! #43
+sMatName[i]=`6023526 lilla`		:cRGB[i][1]=79/255	:cRGB[i][2]=33/255	:cRGB[i][3]=66/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023526_lilla"		:i=i+1	! #44
+sMatName[i]=`6023524 bla`		:cRGB[i][1]=20/255	:cRGB[i][2]=37/255	:cRGB[i][3]=56/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023524_bla"			:i=i+1	! #45
+sMatName[i]=`6023530 gra`		:cRGB[i][1]=92/255	:cRGB[i][2]=91/255	:cRGB[i][3]=89/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023530_gra"			:i=i+1	! #46
+sMatName[i]=`6023528 koks`		:cRGB[i][1]=42/255	:cRGB[i][2]=42/255	:cRGB[i][3]=42/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023528_koks"			:i=i+1	! #47
+sMatName[i]=`6023527 aubergine`	:cRGB[i][1]=22/255	:cRGB[i][2]=10/255	:cRGB[i][3]=15/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023527_aubergine"	:i=i+1	! #48
+sMatName[i]=`6023532 sort`		:cRGB[i][1]=5/255	:cRGB[i][2]=5/255	:cRGB[i][3]=5/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023532_sort"			:i=i+1	! #49
+sMatName[i]=`6023538 jordbar`	:cRGB[i][1]=228/255	:cRGB[i][2]=0/255	:cRGB[i][3]=12/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023538_jordbaer"		:i=i+1	! #50
+sMatName[i]=`6023537 karamell`	:cRGB[i][1]=215/255	:cRGB[i][2]=75/255	:cRGB[i][3]=20/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023537_karamell"		:i=i+1	! #51
+sMatName[i]=`6023536 syrin`		:cRGB[i][1]=102/255	:cRGB[i][2]=64/255	:cRGB[i][3]=82/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Vikingfjord_6023536_syrin"		:i=i+1	! #52
+
+!!Textile - Smarty Plus
+sMatName[i]=`Bubble Gum SZW 03`		:cRGB[i][1]=51/255	:cRGB[i][2]=27/255	:cRGB[i][3]=31/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #53
+sMatName[i]=`Fizz SZW 02`			:cRGB[i][1]=46/255	:cRGB[i][2]=41/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #54
+sMatName[i]=`Bullseye SZW 05`		:cRGB[i][1]=57/255	:cRGB[i][2]=20/255	:cRGB[i][3]=22/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #55
+sMatName[i]=`Jelly Bean SZW 07`		:cRGB[i][1]=28/255	:cRGB[i][2]=38/255	:cRGB[i][3]=38/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #56
+sMatName[i]=`Dolly Mixture SZW 04`	:cRGB[i][1]=25/255	:cRGB[i][2]=30/255	:cRGB[i][3]=44/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #57
+sMatName[i]=`Bon Bon SZW 01`		:cRGB[i][1]=56/255	:cRGB[i][2]=47/255	:cRGB[i][3]=42/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #58
+sMatName[i]=`Gobstopper SZW 06`		:cRGB[i][1]=24/255	:cRGB[i][2]=41/255	:cRGB[i][3]=25/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""			:i=i+1	! #59
+
+!!Textile - Gaja
+sMatName[i]=`68035`				:cRGB[i][1]=112/255	:cRGB[i][2]=136/255	:cRGB[i][3]=25/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_68035"	:i=i+1	! #60
+sMatName[i]=`66007`				:cRGB[i][1]=81/255	:cRGB[i][2]=151/255	:cRGB[i][3]=200/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_66007"	:i=i+1	! #61
+sMatName[i]=`66004`				:cRGB[i][1]=9/255	:cRGB[i][2]=43/255	:cRGB[i][3]=123/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_66004"	:i=i+1	! #62
+sMatName[i]=`66003`				:cRGB[i][1]=59/255	:cRGB[i][2]=61/255	:cRGB[i][3]=71/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_66003"	:i=i+1	! #63
+sMatName[i]=`64089`				:cRGB[i][1]=169/255	:cRGB[i][2]=11/255	:cRGB[i][3]=16/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_64089"	:i=i+1	! #64
+sMatName[i]=`67015`				:cRGB[i][1]=54/255	:cRGB[i][2]=132/255	:cRGB[i][3]=134/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_67015"	:i=i+1	! #65
+sMatName[i]=`64005`				:cRGB[i][1]=19/255	:cRGB[i][2]=22/255	:cRGB[i][3]=57/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_64005"	:i=i+1	! #66
+sMatName[i]=`60019`				:cRGB[i][1]=36/255	:cRGB[i][2]=36/255	:cRGB[i][3]=44/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_60019"	:i=i+1	! #67
+sMatName[i]=`60999`				:cRGB[i][1]=11/255	:cRGB[i][2]=11/255	:cRGB[i][3]=11/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Gaja_60999"	:i=i+1	! #68
+
+!!Textile - Camira Halycon 1
+sMatName[i]=`Blossom HPB 01`	:cRGB[i][1]=125/255	:cRGB[i][2]=48/255	:cRGB[i][3]=79/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_01"	:i=i+1	! #69
+sMatName[i]=`Linden HPL 01`		:cRGB[i][1]=149/255	:cRGB[i][2]=59/255	:cRGB[i][3]=95/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_01"		:i=i+1	! #70
+sMatName[i]=`Aspen HPA 01`		:cRGB[i][1]=137/255	:cRGB[i][2]=49/255	:cRGB[i][3]=81/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_01"		:i=i+1	! #71
+sMatName[i]=`Cedar HPC 01`		:cRGB[i][1]=139/255	:cRGB[i][2]=61/255	:cRGB[i][3]=94/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_01"		:i=i+1	! #72
+sMatName[i]=`Poplar HPP 01`		:cRGB[i][1]=180/255	:cRGB[i][2]=77/255	:cRGB[i][3]=117/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_01"		:i=i+1	! #73
+sMatName[i]=`Blossom HPB 02`	:cRGB[i][1]=81/255	:cRGB[i][2]=78/255	:cRGB[i][3]=98/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_02"	:i=i+1	! #74
+sMatName[i]=`Linden HPL 02`		:cRGB[i][1]=80/255	:cRGB[i][2]=75/255	:cRGB[i][3]=99/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_02"		:i=i+1	! #75
+sMatName[i]=`Aspen HPA 02`		:cRGB[i][1]=87/255	:cRGB[i][2]=85/255	:cRGB[i][3]=104/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_02"		:i=i+1	! #76
+sMatName[i]=`Cedar HPC 02`		:cRGB[i][1]=90/255	:cRGB[i][2]=88/255	:cRGB[i][3]=108/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_02"		:i=i+1	! #77
+sMatName[i]=`Poplar HPP 02`		:cRGB[i][1]=108/255	:cRGB[i][2]=110/255	:cRGB[i][3]=120/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_02"		:i=i+1	! #78
+sMatName[i]=`Blossom HPB 03`	:cRGB[i][1]=53/255	:cRGB[i][2]=39/255	:cRGB[i][3]=60/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_03"	:i=i+1	! #79
+sMatName[i]=`Linden HPL 03`		:cRGB[i][1]=57/255	:cRGB[i][2]=42/255	:cRGB[i][3]=65/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_03"		:i=i+1	! #80
+sMatName[i]=`Cedar HPC 03`		:cRGB[i][1]=85/255	:cRGB[i][2]=59/255	:cRGB[i][3]=85/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_03"		:i=i+1	! #81
+sMatName[i]=`Aspen HPA 03`		:cRGB[i][1]=49/255	:cRGB[i][2]=34/255	:cRGB[i][3]=55/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_03"		:i=i+1	! #82
+sMatName[i]=`Poplar HPP 03`		:cRGB[i][1]=48/255	:cRGB[i][2]=33/255	:cRGB[i][3]=52/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_03"		:i=i+1	! #83
+sMatName[i]=`Blossom HPB 04`	:cRGB[i][1]=35/255	:cRGB[i][2]=55/255	:cRGB[i][3]=84/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_04"	:i=i+1	! #84
+sMatName[i]=`Linden HPL 04`		:cRGB[i][1]=39/255	:cRGB[i][2]=60/255	:cRGB[i][3]=89/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_04"		:i=i+1	! #85
+sMatName[i]=`Cedar HPC 04`		:cRGB[i][1]=40/255	:cRGB[i][2]=71/255	:cRGB[i][3]=104/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_04"		:i=i+1	! #86
+sMatName[i]=`Aspen HPA 04`		:cRGB[i][1]=40/255	:cRGB[i][2]=62/255	:cRGB[i][3]=99/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_04"		:i=i+1	! #87
+sMatName[i]=`Poplar HPP 04`		:cRGB[i][1]=39/255	:cRGB[i][2]=62/255	:cRGB[i][3]=98/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_04"		:i=i+1	! #88
+
+!!Textile - Camira Halycon 2
+sMatName[i]=`Blossom HPB 05`	:cRGB[i][1]=62/255	:cRGB[i][2]=97/255	:cRGB[i][3]=142/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_05"	:i=i+1	! #89
+sMatName[i]=`Linden HPL 05`		:cRGB[i][1]=71/255	:cRGB[i][2]=118/255	:cRGB[i][3]=171/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_05"		:i=i+1	! #90
+sMatName[i]=`Cedar HPC 05`		:cRGB[i][1]=60/255	:cRGB[i][2]=105/255	:cRGB[i][3]=156/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_05"		:i=i+1	! #91
+sMatName[i]=`Aspen HPA 05`		:cRGB[i][1]=58/255	:cRGB[i][2]=97/255	:cRGB[i][3]=144/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_05"		:i=i+1	! #92
+sMatName[i]=`Poplar HPP 05`		:cRGB[i][1]=55/255	:cRGB[i][2]=106/255	:cRGB[i][3]=169/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_05"		:i=i+1	! #93
+sMatName[i]=`Blossom HPB 06`	:cRGB[i][1]=29/255	:cRGB[i][2]=94/255	:cRGB[i][3]=117/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_06"	:i=i+1	! #94
+sMatName[i]=`Linden HPL 06`		:cRGB[i][1]=24/255	:cRGB[i][2]=97/255	:cRGB[i][3]=125/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_06"		:i=i+1	! #95
+sMatName[i]=`Cedar HPC 06`		:cRGB[i][1]=28/255	:cRGB[i][2]=95/255	:cRGB[i][3]=120/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_06"		:i=i+1	! #96
+sMatName[i]=`Aspen HPA 06`		:cRGB[i][1]=26/255	:cRGB[i][2]=101/255	:cRGB[i][3]=128/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_06"		:i=i+1	! #97
+sMatName[i]=`Poplar HPP 06`		:cRGB[i][1]=22/255	:cRGB[i][2]=122/255	:cRGB[i][3]=149/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_06"		:i=i+1	! #98
+sMatName[i]=`Blossom HPB 07`	:cRGB[i][1]=136/255	:cRGB[i][2]=145/255	:cRGB[i][3]=46/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_07"	:i=i+1	! #99
+sMatName[i]=`Linden HPL 07`		:cRGB[i][1]=155/255	:cRGB[i][2]=166/255	:cRGB[i][3]=48/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_07"		:i=i+1	! #100
+sMatName[i]=`Cedar HPC 07`		:cRGB[i][1]=149/255	:cRGB[i][2]=159/255	:cRGB[i][3]=45/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_07"		:i=i+1	! #101
+sMatName[i]=`Aspen HPA 07`		:cRGB[i][1]=144/255	:cRGB[i][2]=152/255	:cRGB[i][3]=50/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_07"		:i=i+1	! #102
+sMatName[i]=`Poplar HPP 07`		:cRGB[i][1]=179/255	:cRGB[i][2]=189/255	:cRGB[i][3]=42/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_07"		:i=i+1	! #103
+sMatName[i]=`Blossom HPB 08`	:cRGB[i][1]=110/255	:cRGB[i][2]=110/255	:cRGB[i][3]=53/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_08"	:i=i+1	! #104
+sMatName[i]=`Linden HPL 08`		:cRGB[i][1]=112/255	:cRGB[i][2]=114/255	:cRGB[i][3]=52/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_08"		:i=i+1	! #105
+sMatName[i]=`Cedar HPC 08`		:cRGB[i][1]=148/255	:cRGB[i][2]=151/255	:cRGB[i][3]=71/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_08"		:i=i+1	! #106
+sMatName[i]=`Aspen HPA 08`		:cRGB[i][1]=121/255	:cRGB[i][2]=123/255	:cRGB[i][3]=52/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_08"		:i=i+1	! #107
+sMatName[i]=`Poplar HPP 08`		:cRGB[i][1]=119/255	:cRGB[i][2]=121/255	:cRGB[i][3]=54/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_08"		:i=i+1	! #108
+
+!!Textile - Camira Halycon 3
+sMatName[i]=`Blossom HPB 09`	:cRGB[i][1]=67/255	:cRGB[i][2]=109/255	:cRGB[i][3]=106/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_09"	:i=i+1	! #109
+sMatName[i]=`Linden HPL 09`		:cRGB[i][1]=65/255	:cRGB[i][2]=120/255	:cRGB[i][3]=116/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_09"		:i=i+1	! #110
+sMatName[i]=`Cedar HPC 09`		:cRGB[i][1]=72/255	:cRGB[i][2]=121/255	:cRGB[i][3]=116/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_09"		:i=i+1	! #111
+sMatName[i]=`Aspen HPA 09`		:cRGB[i][1]=68/255	:cRGB[i][2]=115/255	:cRGB[i][3]=111/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_09"		:i=i+1	! #112
+sMatName[i]=`Poplar HPP 09`		:cRGB[i][1]=86/255	:cRGB[i][2]=144/255	:cRGB[i][3]=134/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_09"		:i=i+1	! #113
+sMatName[i]=`Blossom HPB 10`	:cRGB[i][1]=149/255	:cRGB[i][2]=129/255	:cRGB[i][3]=102/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_10"	:i=i+1	! #114
+sMatName[i]=`Linden HPL 10`		:cRGB[i][1]=156/255	:cRGB[i][2]=134/255	:cRGB[i][3]=103/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_10"		:i=i+1	! #115
+sMatName[i]=`Cedar HPC 10`		:cRGB[i][1]=157/255	:cRGB[i][2]=134/255	:cRGB[i][3]=105/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_10"		:i=i+1	! #116
+sMatName[i]=`Aspen HPA 10`		:cRGB[i][1]=152/255	:cRGB[i][2]=133/255	:cRGB[i][3]=109/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_10"		:i=i+1	! #117
+sMatName[i]=`Poplar HPP 10`		:cRGB[i][1]=179/255	:cRGB[i][2]=152/255	:cRGB[i][3]=118/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_10"		:i=i+1	! #118
+sMatName[i]=`Blossom HPB 11`	:cRGB[i][1]=140/255	:cRGB[i][2]=64/255	:cRGB[i][3]=40/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_11"	:i=i+1	! #119
+sMatName[i]=`Linden HPL 11`		:cRGB[i][1]=143/255	:cRGB[i][2]=66/255	:cRGB[i][3]=40/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_11"		:i=i+1	! #120
+sMatName[i]=`Cedar HPC 11`		:cRGB[i][1]=141/255	:cRGB[i][2]=63/255	:cRGB[i][3]=38/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_11"		:i=i+1	! #121
+sMatName[i]=`Aspen HPA 11`		:cRGB[i][1]=144/255	:cRGB[i][2]=60/255	:cRGB[i][3]=41/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_11"		:i=i+1	! #122
+sMatName[i]=`Poplar HPP 11`		:cRGB[i][1]=182/255	:cRGB[i][2]=85/255	:cRGB[i][3]=47/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_11"		:i=i+1	! #123
+sMatName[i]=`Blossom HPB 12`	:cRGB[i][1]=72/255	:cRGB[i][2]=72/255	:cRGB[i][3]=66/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Blossom_HPB_12"	:i=i+1	! #124
+sMatName[i]=`Linden HPL 12`		:cRGB[i][1]=79/255	:cRGB[i][2]=78/255	:cRGB[i][3]=75/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Linden_HPL_12"		:i=i+1	! #125
+sMatName[i]=`Cedar HPC 12`		:cRGB[i][1]=112/255	:cRGB[i][2]=108/255	:cRGB[i][3]=99/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Cedar_HPC_12"		:i=i+1	! #126
+sMatName[i]=`Aspen HPA 12`		:cRGB[i][1]=83/255	:cRGB[i][2]=83/255	:cRGB[i][3]=77/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Aspen_HPA_12"		:i=i+1	! #127
+sMatName[i]=`Poplar HPP 12`		:cRGB[i][1]=82/255	:cRGB[i][2]=82/255	:cRGB[i][3]=74/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Camira_Halcyon_Poplar_HPP_12"		:i=i+1	! #128
+
+!!Textile - 24/7+
+sMatName[i]=`Minute WK 008`		:cRGB[i][1]=92/255	:cRGB[i][2]=50/255	:cRGB[i][3]=53/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Minute WK 008"		:i=i+1	! #129
+sMatName[i]=`Solstice WK 018`	:cRGB[i][1]=227/255	:cRGB[i][2]=20/255	:cRGB[i][3]=20/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Solstice WK 018"		:i=i+1	! #130
+sMatName[i]=`Timeless WK 016`	:cRGB[i][1]=135/255	:cRGB[i][2]=17/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Timeless WK 016"		:i=i+1	! #131
+sMatName[i]=`Sundown WK 010`	:cRGB[i][1]=88/255	:cRGB[i][2]=51/255	:cRGB[i][3]=58/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Sundown WK 010"		:i=i+1	! #132
+sMatName[i]=`Continual WK 004`	:cRGB[i][1]=71/255	:cRGB[i][2]=74/255	:cRGB[i][3]=90/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Continual WK 004"	:i=i+1	! #133
+sMatName[i]=`Epoch WK 022`		:cRGB[i][1]=41/255	:cRGB[i][2]=46/255	:cRGB[i][3]=90/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Epoch WK 022"		:i=i+1	! #134
+sMatName[i]=`Pendulum WK 023`	:cRGB[i][1]=35/255	:cRGB[i][2]=58/255	:cRGB[i][3]=110/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Pendulum WK 023"		:i=i+1	! #135
+sMatName[i]=`Era WK 009`		:cRGB[i][1]=75/255	:cRGB[i][2]=69/255	:cRGB[i][3]=84/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Era WK 009"			:i=i+1	! #136
+sMatName[i]=`Night WK 012`		:cRGB[i][1]=51/255	:cRGB[i][2]=44/255	:cRGB[i][3]=46/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Night WK 012"		:i=i+1	! #137
+sMatName[i]=`Season WK 024`		:cRGB[i][1]=75/255	:cRGB[i][2]=114/255	:cRGB[i][3]=76/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Season WK 024"		:i=i+1	! #138
+sMatName[i]=`Forever WK 017`	:cRGB[i][1]=52/255	:cRGB[i][2]=43/255	:cRGB[i][3]=46/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Forever WK 017"		:i=i+1	! #139
+sMatName[i]=`Duration WK 007`	:cRGB[i][1]=68/255	:cRGB[i][2]=75/255	:cRGB[i][3]=58/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Duration WK 007"		:i=i+1	! #140
+sMatName[i]=`Day WK 003`		:cRGB[i][1]=49/255	:cRGB[i][2]=49/255	:cRGB[i][3]=62/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Day WK 003"			:i=i+1	! #141
+sMatName[i]=`Ticking WK 014`	:cRGB[i][1]=63/255	:cRGB[i][2]=93/255	:cRGB[i][3]=140/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Ticking WK 014"		:i=i+1	! #142
+sMatName[i]=`Perpetual WK 013`	:cRGB[i][1]=28/255	:cRGB[i][2]=49/255	:cRGB[i][3]=94/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Perpetual WK 013"	:i=i+1	! #143
+sMatName[i]=`Hour WK 001`		:cRGB[i][1]=31/255	:cRGB[i][2]=35/255	:cRGB[i][3]=52/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Hour WK 001"			:i=i+1	! #144
+sMatName[i]=`Zenith WK 002`		:cRGB[i][1]=80/255	:cRGB[i][2]=73/255	:cRGB[i][3]=73/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Zenith WK 002"		:i=i+1	! #145
+sMatName[i]=`Decade WK 020`		:cRGB[i][1]=138/255	:cRGB[i][2]=134/255	:cRGB[i][3]=130/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Decade WK 020"		:i=i+1	! #146
+sMatName[i]=`Nadir WK 021`		:cRGB[i][1]=70/255	:cRGB[i][2]=63/255	:cRGB[i][3]=59/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Nadir WK 021"		:i=i+1	! #147
+sMatName[i]=`Century WK 025`	:cRGB[i][1]=51/255	:cRGB[i][2]=44/255	:cRGB[i][3]=44/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="24_7_Century WK 025"		:i=i+1	! #148
+
+!!Textile - Bloom Cyber
+sMatName[i]=`Black BL418`		:cRGB[i][1]=50/255	:cRGB[i][2]=50/255	:cRGB[i][3]=50/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Cyber_Black BL418"		:i=i+1	! #149
+sMatName[i]=`Oliven BL411`		:cRGB[i][1]=149/255	:cRGB[i][2]=141/255	:cRGB[i][3]=62/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Cyber_Oliven BL411"		:i=i+1	! #150
+sMatName[i]=`SteelBlue BL414`	:cRGB[i][1]=80/255	:cRGB[i][2]=95/255	:cRGB[i][3]=105/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Cyber_SteelBlue BL414"	:i=i+1	! #151
+sMatName[i]=`Grey BL417`		:cRGB[i][1]=110/255	:cRGB[i][2]=107/255	:cRGB[i][3]=112/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Cyber_Grey BL417"		:i=i+1	! #152
+
+!!Textile - Bloom Scoop
+sMatName[i]=`Black BL418`		:cRGB[i][1]=50/255	:cRGB[i][2]=50/255	:cRGB[i][3]=50/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Black BL418"		:i=i+1	! #153
+sMatName[i]=`Grey BL417`		:cRGB[i][1]=110/255	:cRGB[i][2]=107/255	:cRGB[i][3]=112/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Grey BL417"		:i=i+1	! #154
+sMatName[i]=`Teel Blue BL 413`	:cRGB[i][1]=93/255	:cRGB[i][2]=130/255	:cRGB[i][3]=123/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Teel Blue BL 413"	:i=i+1	! #155
+sMatName[i]=`Oliven BL411`		:cRGB[i][1]=149/255	:cRGB[i][2]=141/255	:cRGB[i][3]=62/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Oliven BL411"		:i=i+1	! #156
+sMatName[i]=`Red BL 402`		:cRGB[i][1]=162/255	:cRGB[i][2]=14/255	:cRGB[i][3]=26/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Red BL 402"		:i=i+1	! #157
+sMatName[i]=`Honey BL404`		:cRGB[i][1]=214/255	:cRGB[i][2]=146/255	:cRGB[i][3]=65/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="Bloom_Scoop_Honey BL404"		:i=i+1	! #158
+
+!!Plastic - R-48
+plasticStart = 159		!! Az UI miatt kell (képek számozása)
+sMatName[i]=`Oliven`		:cRGB[i][1]=113/255	:cRGB[i][2]=149/255	:cRGB[i][3]=92/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #159
+sMatName[i]=`Brun`			:cRGB[i][1]=100/255	:cRGB[i][2]=62/255	:cRGB[i][3]=43/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #160
+sMatName[i]=`Rod`			:cRGB[i][1]=221/255	:cRGB[i][2]=39/255	:cRGB[i][3]=33/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #161
+sMatName[i]=`Gra`			:cRGB[i][1]=173/255	:cRGB[i][2]=165/255	:cRGB[i][3]=163/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #162
+sMatName[i]=`Sort`			:cRGB[i][1]=36/255	:cRGB[i][2]=27/255	:cRGB[i][3]=21/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #163
+sMatName[i]=`Bla`			:cRGB[i][1]=56/255	:cRGB[i][2]=63/255	:cRGB[i][3]=91/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #164
+sMatName[i]=`Hvit`			:cRGB[i][1]=253/255	:cRGB[i][2]=253/255	:cRGB[i][3]=245/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #165
+
+!!Plastic - Coda
+sMatName[i]=`Sort`			:cRGB[i][1]=22/255	:cRGB[i][2]=15/255	:cRGB[i][3]=13/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #166
+sMatName[i]=`Gra`			:cRGB[i][1]=136/255	:cRGB[i][2]=126/255	:cRGB[i][3]=124/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #167
+sMatName[i]=`Bla`			:cRGB[i][1]=23/255	:cRGB[i][2]=41/255	:cRGB[i][3]=125/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #168
+sMatName[i]=`Hvit`			:cRGB[i][1]=226/255	:cRGB[i][2]=213/255	:cRGB[i][3]=205/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #169
+sMatName[i]=`Rod`			:cRGB[i][1]=205/255	:cRGB[i][2]=36/255	:cRGB[i][3]=32/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #170
+
+!!Plastic - Rio / Samba
+sMatName[i]=`Sort`			:cRGB[i][1]=38/255	:cRGB[i][2]=32/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #171
+sMatName[i]=`Gra`			:cRGB[i][1]=145/255	:cRGB[i][2]=127/255	:cRGB[i][3]=116/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #172
+sMatName[i]=`Rod`			:cRGB[i][1]=226/255	:cRGB[i][2]=40/255	:cRGB[i][3]=36/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #173
+sMatName[i]=`Gul`			:cRGB[i][1]=240/255	:cRGB[i][2]=200/255	:cRGB[i][3]=42/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #174
+sMatName[i]=`Gronn`			:cRGB[i][1]=21/255	:cRGB[i][2]=153/255	:cRGB[i][3]=135/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #175
+sMatName[i]=`Bla`			:cRGB[i][1]=53/255	:cRGB[i][2]=53/255	:cRGB[i][3]=79/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #176
+sMatName[i]=`Hvit`			:cRGB[i][1]=253/255	:cRGB[i][2]=253/255	:cRGB[i][3]=245/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #177
+
+!!Plastic - Samba / Rio Jr / Mini
+sMatName[i]=`Sort`			:cRGB[i][1]=38/255	:cRGB[i][2]=32/255	:cRGB[i][3]=28/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #178
+sMatName[i]=`Gra`			:cRGB[i][1]=145/255	:cRGB[i][2]=127/255	:cRGB[i][3]=116/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #179
+sMatName[i]=`Rod`			:cRGB[i][1]=226/255	:cRGB[i][2]=40/255	:cRGB[i][3]=36/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #180
+sMatName[i]=`Gronn`			:cRGB[i][1]=21/255	:cRGB[i][2]=153/255	:cRGB[i][3]=135/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #181
+
+!!Plastic - Moon
+sMatName[i]=`Sort`			:cRGB[i][1]=40/255	:cRGB[i][2]=35/255	:cRGB[i][3]=31/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #182
+sMatName[i]=`Bla`			:cRGB[i][1]=55/255	:cRGB[i][2]=53/255	:cRGB[i][3]=80/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #183
+sMatName[i]=`Mango`			:cRGB[i][1]=224/255	:cRGB[i][2]=161/255	:cRGB[i][3]=83/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #184
+sMatName[i]=`Rod`			:cRGB[i][1]=230/255	:cRGB[i][2]=75/255	:cRGB[i][3]=70/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #185
+sMatName[i]=`Oliven`		:cRGB[i][1]=141/255	:cRGB[i][2]=127/255	:cRGB[i][3]=30/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #186
+sMatName[i]=`Gra`			:cRGB[i][1]=135/255	:cRGB[i][2]=121/255	:cRGB[i][3]=112/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #187
+
+!!Plastic - Public
+sMatName[i]=`Lilla Ral 4005`			:cRGB[i][1]=138/255	:cRGB[i][2]=114/255	:cRGB[i][3]=174/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #188
+sMatName[i]=`Rod Ral 3000`				:cRGB[i][1]=194/255	:cRGB[i][2]=23/255	:cRGB[i][3]=21/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #189
+sMatName[i]=`Orange Ral 2010`			:cRGB[i][1]=206/255	:cRGB[i][2]=93/255	:cRGB[i][3]=49/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #190
+sMatName[i]=`Okergul Ral 1024`			:cRGB[i][1]=181/255	:cRGB[i][2]=146/255	:cRGB[i][3]=18/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #191
+sMatName[i]=`Gronn Ral 6025`			:cRGB[i][1]=94/255	:cRGB[i][2]=109/255	:cRGB[i][3]=62/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #192
+sMatName[i]=`Pastellturkis Ral 6034`	:cRGB[i][1]=124/255	:cRGB[i][2]=185/255	:cRGB[i][3]=184/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #193
+sMatName[i]=`Pastellbla Ral 5024`		:cRGB[i][1]=116/255	:cRGB[i][2]=175/255	:cRGB[i][3]=207/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #194
+sMatName[i]=`Grahvit Ral 9002`			:cRGB[i][1]=220/255	:cRGB[i][2]=220/255	:cRGB[i][3]=212/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #195
+sMatName[i]=`Gra Ral 7044`				:cRGB[i][1]=164/255	:cRGB[i][2]=164/255	:cRGB[i][3]=164/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #196
+sMatName[i]=`Sort Ral 9004`				:cRGB[i][1]=47/255	:cRGB[i][2]=52/255	:cRGB[i][3]=54/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #197
+
+!!Laminat - standard
+laminatStart = 198		!! Az UI miatt kell (képek számozása)
+sMatName[i]=`Bjork`			:cRGB[i][1]=220/255	:cRGB[i][2]=187/255	:cRGB[i][3]=143/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #198
+sMatName[i]=`Bok`			:cRGB[i][1]=210/255	:cRGB[i][2]=159/255	:cRGB[i][3]=102/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #199
+sMatName[i]=`Hvit`			:cRGB[i][1]=240/255	:cRGB[i][2]=240/255	:cRGB[i][3]=240/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #200
+sMatName[i]=`Gra`			:cRGB[i][1]=212/255	:cRGB[i][2]=212/255	:cRGB[i][3]=212/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #201
+sMatName[i]=`Bjork`			:cRGB[i][1]=233/255	:cRGB[i][2]=220/255	:cRGB[i][3]=179/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #202
+sMatName[i]=`Bok`			:cRGB[i][1]=232/255	:cRGB[i][2]=181/255	:cRGB[i][3]=108/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #203
+
+!!Laminat - Forbo
+sMatName[i]=`4155 pewter`	:cRGB[i][1]=77/255	:cRGB[i][2]=85/255	:cRGB[i][3]=86/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #204
+sMatName[i]=`4140 jeans`	:cRGB[i][1]=52/255	:cRGB[i][2]=70/255	:cRGB[i][3]=85/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #205
+sMatName[i]=`4172 mauve`	:cRGB[i][1]=95/255	:cRGB[i][2]=84/255	:cRGB[i][3]=80/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #206
+sMatName[i]=`4173 brandy`	:cRGB[i][1]=137/255	:cRGB[i][2]=79/255	:cRGB[i][3]=51/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #207
+sMatName[i]=`4164 salsa`	:cRGB[i][1]=154/255	:cRGB[i][2]=39/255	:cRGB[i][3]=37/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""	:i=i+1	! #208
+
+!!Wood
+woodStart = 210		!! Az UI miatt kell (képek számozása)
+sMatName[i]=`Wenge`			:cRGB[i][1]=39/255	:cRGB[i][2]=38/255	:cRGB[i][3]=33/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_wenge"		:i=i+1	! #209
+sMatName[i]=`Black`			:cRGB[i][1]=22/255	:cRGB[i][2]=33/255	:cRGB[i][3]=29/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_black"		:i=i+1	! #210
+sMatName[i]=`Walnut`		:cRGB[i][1]=130/255	:cRGB[i][2]=97/255	:cRGB[i][3]=73/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_walnut"		:i=i+1	! #211
+sMatName[i]=`Brown`			:cRGB[i][1]=89/255	:cRGB[i][2]=42/255	:cRGB[i][3]=19/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_brown"		:i=i+1	! #212
+sMatName[i]=`Teak`			:cRGB[i][1]=150/255	:cRGB[i][2]=95/255	:cRGB[i][3]=38/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_teak"		:i=i+1	! #213
+sMatName[i]=`Oak`			:cRGB[i][1]=199/255	:cRGB[i][2]=150/255	:cRGB[i][3]=99/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_oak"			:i=i+1	! #214
+sMatName[i]=`Natural`		:cRGB[i][1]=215/255	:cRGB[i][2]=181/255	:cRGB[i][3]=132/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]="wood_natural"		:i=i+1	! #215
+
+!! Steel
+steelStart = 217		!! Az UI miatt kell (képek számozása)
+sMatName[i]=`Chrome`		:cRGB[i][1]=245/255	:cRGB[i][2]=245/255	:cRGB[i][3]=245/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""					:i=i+1	! #216
+sMatName[i]=`Black epoxy`	:cRGB[i][1]=1/255	:cRGB[i][2]=1/255	:cRGB[i][3]=1/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""					:i=i+1	! #217
+sMatName[i]=`Aluminium`		:cRGB[i][1]=230/255	:cRGB[i][2]=230/255	:cRGB[i][3]=230/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""					:i=i+1	! #218
+sMatName[i]=`Silver`		:cRGB[i][1]=250/255	:cRGB[i][2]=250/255	:cRGB[i][3]=250/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""					:i=i+1	! #219
+! painted (custom?)
+
+!! Glass
+sMatName[i]=`Glass`			:cRGB[i][1]=227/255	:cRGB[i][2]=238/255	:cRGB[i][3]=249/255	:sRGB[i][1]=255/255	:sRGB[i][2]=255/255	:sRGB[i][3]=255/255	:sTexName[i]=""				:i=i+1	! #220
+
+!! ==============================================================================
+!! Create Material - belső használatra
+!! ==============================================================================
+!for i = 1 TO VARDIM1(sMatName)
+!		textureName = sTexName[i]
+!		matName = sMatName[i]
+!
+!		if textureName <> "" then
+!			!----Definition----
+!			DEFINE TEXTURE matName textureName, 1, 1, 2, 0
+!			DEFINE MATERIAL	matName 20,
+!				cRGB[i][1], cRGB[i][2], cRGB[i][3],
+!				0.73, 0.55, 0.7, 0, 20, 0,
+!				sRGB[i][1], sRGB[i][2], sRGB[i][3],
+!				0, 0, 0,
+!				0, 0, 1,
+!				IND(TEXTURE, matName)
+!		endif
+!next i
+
+! ==============================================================================
+!
+! Colors
+!
+! ==============================================================================
+if GLOB_SCRIPT_TYPE = 5 then
+	! ------------------------------------------------------------------------------
+	! Back Material
+	! ------------------------------------------------------------------------------
+	dim backMatArray[]
+		gosub "ColorforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	backMatArray = tempArray
+
+	! ------------------------------------------------------------------------------
+	! Seat Material
+	! ------------------------------------------------------------------------------
+	dim seatMatArray[]
+		gosub "ColorforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	seatMatArray = tempArray
+
+	! ------------------------------------------------------------------------------
+	! Armrest Material
+	! ------------------------------------------------------------------------------
+	dim armMatArray[]
+		gosub "ColorforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	armMatArray = tempArray
+
+
+	! ------------------------------------------------------------------------------
+	! Plastic  Material
+	! ------------------------------------------------------------------------------
+	dim plasticMatArray[]
+		gosub "PlasticforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	plasticMatArray = tempArray
+
+
+	! ------------------------------------------------------------------------------
+	! Wood Material
+	! ------------------------------------------------------------------------------
+	dim woodMatArray[]
+		gosub "WoodforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	woodMatArray = tempArray
+
+	! ------------------------------------------------------------------------------
+	! Steel Material
+	! ------------------------------------------------------------------------------
+	dim steelMatArray[]
+		gosub "SteelforType"
+	put 0 							!Enable for custom color
+	gosub "fillArray"
+	steelMatArray = tempArray
+endif
+	
+
+if GLOB_SCRIPT_TYPE <> 3 then
+	! ------------------------------------------------------------------------------
+	! Names
+	! ------------------------------------------------------------------------------
+	dim stMatBack[]
+	for i = 1 to vardim1(backMatArray)
+		if backMatArray[i] <> 0 then
+			stMatBack[i] = sMatName[backMatArray[i]]
+		else
+			stMatBack[i] = stMaterialUI[1]		!Custom
+		endif
+	next i
+	
+	dim stMatSeat[]
+	for i = 1 to vardim1(seatMatArray)
+		if seatMatArray[i] <> 0 then
+			stMatSeat[i] = sMatName[seatMatArray[i]]
+		else
+			stMatSeat[i] = stMaterialUI[1]		!Custom
+		endif
+	next i
+
+	dim stMatArm[]
+	for i = 1 to vardim1(armMatArray)
+		if armMatArray[i] <> 0 then
+			stMatArm[i] = sMatName[armMatArray[i]]
+		else
+			stMatArm[i] = stMaterialUI[1]		!Custom
+		endif
+	next i
+
+	dim stMatPlastic[]
+	for i = 1 to vardim1(plasticMatArray)
+		if plasticMatArray[i] <> 0 then
+			stMatPlastic[i] = sMatName[plasticMatArray[i]]
+		else
+			stMatPlastic[i] = stMaterialUI[1]	!Custom
+		endif
+	next i
+
+	dim stMatWood[]
+	for i = 1 to vardim1(woodMatArray)
+		if woodMatArray[i] <> 0 then
+			stMatWood[i] = sMatName[woodMatArray[i]]
+		else
+			stMatWood[i] = stMaterialUI[1]		!Custom
+		endif
+	next i
+
+	dim stMatSteel[]
+	for i = 1 to vardim1(steelMatArray)
+		if steelMatArray[i] <> 0 then
+			stMatSteel[i] = sMatName[steelMatArray[i]]
+		else
+			stMatSteel[i] = stMaterialUI[1]		!Custom
+		endif
+	next i
+endif
+
+
+! ==============================================================================
+!
+! End of Master Script
+!
+! ==============================================================================
+
+goto "endMasterScript"
+
+! ==============================================================================
+!
+! Subrutines
+!
+! ==============================================================================
+"fillArray":
+	dim tempArray[]
+	for i = 1 to NSP
+		tempArray[i] = get(1)
+	next i
+return
+
+! ==============================================================================
+! Color for Type
+! ------------------------------------------------------------------------------
+"ColorforType":
+	if iUpholsteryType = UPHOLSTERY_LEATHER then
+		if iLeatherType = LEATHER_GRAIN then
+			put 1, 2, 3, 4, 5, 6
+		endif
+		if iLeatherType = LEATHER_FLOR then
+			put 7, 8, 9, 10, 11, 12
+		endif
+	else
+		if iTextileType = TEXTILE_FRIDA then
+			put 13, 14, 15, 16
+		endif
+		if iTextileType = TEXTILE_LUCIA then
+			put 17, 18, 19, 20, 21, 22, 23, 24, 25
+		endif
+		if iTextileType = TEXTILE_BUCO then
+			put 26, 27, 28, 29, 30, 31, 32, 33, 34
+		endif
+		if iTextileType = TEXTILE_VIKINGFJORD then
+			put 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52
+		endif
+		if iTextileType = TEXTILE_SMARTYPLUS then
+			put 53, 54, 55, 56, 57, 58, 59
+		endif
+		if iTextileType = TEXTILE_GAJA then
+			put 60, 61, 62, 63, 64, 65, 66, 67, 68
+		endif
+		if iTextileType = TEXTILE_HALYCON1 then
+			put 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88
+		endif
+		if iTextileType = TEXTILE_HALYCON2 then
+			put 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108
+		endif
+		if iTextileType = TEXTILE_HALYCON3 then
+			put 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128
+		endif
+		if iTextileType = TEXTILE_247 then
+			put 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148
+		endif
+		if iTextileType = TEXTILE_BLOOMCYBER then
+			put 149, 150, 151, 152
+		endif
+		if iTextileType = TEXTILE_BLOOMSCOOP then
+			put 153, 154, 155, 156, 157, 158
+		endif
+	endif
+return
+
+! ==============================================================================
+! Plastic for Type
+! ------------------------------------------------------------------------------
+"PlasticforType":
+	if iPlasticType = PLASTIC_R48 then
+		put 159, 160, 161, 162, 163, 164, 165
+	endif
+	if iPlasticType = PLASTIC_CODA then
+		put 166, 167, 168, 169, 170
+	endif
+	if iPlasticType = PLASTIC_RIO then
+		put 171, 172, 173, 174, 175, 176, 177
+	endif
+	if iPlasticType = PLASTIC_RIOJR then
+		put 178, 179, 180, 181
+	endif
+	if iPlasticType = PLASTIC_MOON then
+		put 182, 183, 184, 185, 186, 187
+	endif
+	if iPlasticType = PLASTIC_PUBLIC then
+		put 188, 189, 190, 191, 192, 193, 194, 195, 196, 197
+	endif
+return
+
+! ==============================================================================
+! Wood for Type
+! ------------------------------------------------------------------------------
+"WoodforType":
+	if iType <> TYPE_NORDICLIGHT then
+		put 198, 199, 200, 201, 202, 203 	! Laminat standard
+	else
+		put 204, 205, 206, 207, 208			! Laminat Forbo
+	endif
+
+!!		put	210, 211, 212, 213, 214, 215, 216 		! Wood
+
+return
+
+! ==============================================================================
+! Steel for Type
+! ------------------------------------------------------------------------------
+"SteelforType":
+	if iType = TYPE_RIO or iType = TYPE_RIOBARSTOL then
+		put 216, 219 
+	endif
+	if iType = TYPE_RIOMINI or iType = TYPE_RIOJUNIOR then
+		put 219
+	endif
+	if iType = TYPE_R48 then
+		put 216, 217
+	endif
+	if iType = TYPE_SAMBA then
+		put 218
+	endif
+return
+
+! ==============================================================================
+!
+! End of Master Script
+!
+! ==============================================================================
+
+"endMasterScript":
+
+]]>
+</Script_1D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_PR SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_PR>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_UI SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------------------
+! Picture Data
+! ------------------------------------------------------------------------------
+
+DIM uiMatPict[]
+	uiMatPict[1]	= "ui_upholstery_leather.png"			!ui_upholstery_leather.jpg
+	uiMatPict[2]	= "ui_upholstery_textile.png"			!ui_upholstery_textile.jpg
+	uiMatPict[3]	= "ui_upholstery_plastic.png"			!ui_upholstery_plastic.jpg
+	uiMatPict[4]	= "ui_upholstery_laminat.png"			!ui_upholstery_laminat.jpg
+
+if iSeatPAdding > 1.1 then								! elszürkíti az inaktívat
+	iFlag = 0
+else
+	iFlag = 4
+endif
+
+! ==================================================================
+! Page 2
+! ==================================================================
+if uiPage = 2 then
+	if iElementType = ELEMENT_TABLE then
+	
+	endif
+
+	if iElementType = ELEMENT_CHAIR then
+			pictX = 22
+			pictY = 22
+			needX = 26
+			needY = 26
+		
+			x2 = 5
+			x3 = 22
+			x4 = 184
+			x5 = 403
+			hMatBox = 160
+			hMatBox2 = 37
+			hTextBox = 70
+			vMatBox = 28
+			vText =20
+			yStart = 75
+			dy2 = 30
+			
+			UI_SEPARATOR 0, yStart-4, 444, yStart-4
+		
+			! -------Outer---------------------
+			y = yStart
+		
+			UI_INFIELD{3} "UpholsteryType", 0, y-40, hMatBox-2, vMatBox+6,
+				2,"",1,1,
+				needX, needY, pictX, pictY,
+				uiMatPict[1],	stUpholsteryType[1],	 stUpholsteryType[1],
+				uiMatPict[2],	stUpholsteryType[2],	 stUpholsteryType[2]		UI_TOOLTIP stMaterialUI[7]	! Upholstery Type
+		
+			UI_PICT uiMatPict[iUpholsteryType], x2+6, ystart+58, 200, 120, 1
+		
+			! -------elválasztó---------------------
+		
+			UI_SEPARATOR x4+43, yStart, x4+43, yStart+185	
+	
+		! ------------------------------------------------------------------------------
+		! LEATHER TYPE
+		! ------------------------------------------------------------------------------	
+			if iUpholsteryType = UPHOLSTERY_LEATHER then
+		
+				!-------------------
+				
+				if iLeatherType = LEATHER_GRAIN then
+					ps = 0
+					pictNameLeather = "ui_color_leather_grain"
+				endif
+				if iLeatherType = LEATHER_FLOR then 
+					ps = 6
+					pictNameLeather = "ui_color_leather_flor"
+				endif
+			
+				!--------------------------------------
+		
+				UI_STYLE 0, 1
+				UI_OUTFIELD stMaterialUI[8], x2+6, y, x4+hMatBox2-x3, 14, iFlag	 	UI_TOOLTIP stMaterialUI[8]		! Leather Type
+				UI_STYLE 0, 0
+				y = y + 15
+			
+				UI_SEPARATOR 0, 125, 225, 125
+			
+				UI_INFIELD{3} "LeatherType", x2+6, y, hMatBox+40, vMatBox,
+					2,"",1,1,
+					needX, needY, pictX, pictY,
+					uiMatPict[1],	stLeatherType[1],	 stLeatherType[1],
+					uiMatPict[1],	stLeatherType[2],	 stLeatherType[2]			UI_TOOLTIP stMaterialUI[8]		! Leather Type
+
+			!--------------------------------------		
+			! -------2. oszlop---------------------
+			!--------------------------------------
+
+				x2 = 222
+				x3 = 242
+				x4 = 403
+			
+				y = yStart
+			
+				UI_STYLE 0, 1
+				if iElementType = ELEMENT_CHAIR then
+					UI_OUTFIELD stMaterialUI[10], x3, y, x4+hMatBox2-x3, 14, iFlag	UI_TOOLTIP stMaterialUI[10]		! Upholstery Material
+				endif
+				UI_STYLE 0, 0
+				y = y + 15
+			
+		!			pS			= 0
+					pictName 	= pictNameLeather
+					rowNumber	= 3
+			
+				gosub "materialBack"
+				y = y + dy2
+			
+!!				UI_STYLE 0, 1
+!!				UI_OUTFIELD stMaterialUI[3], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[3]			! Seat Material
+!!				UI_STYLE 0, 0
+!!				y = y + 15
+!!			
+!!		!			pS			= 0
+!!					pictName 	= pictNameLeather
+!!					rowNumber	= 3
+!!			
+!!				gosub "materialSeat"
+!!				y = y + dy2
+!!			
+!!				UI_STYLE 0, 1
+!!				UI_OUTFIELD stMaterialUI[4], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[4]			! Arm Material
+!!				UI_STYLE 0, 0
+!!				y = y + 15
+!!			
+!!		!			pS			= 0
+!!					pictName 	= pictNameLeather
+!!					rowNumber	= 3
+!!			
+!!				gosub "materialArm"
+!!				y = y + dy2
+	
+			endif
+		
+		! ------------------------------------------------------------------------------
+		! TEXTILE TYPE
+		! ------------------------------------------------------------------------------	
+		
+			if iUpholsteryType = UPHOLSTERY_TEXTILE then
+			
+				!-------------------
+				
+				if iTextileType = TEXTILE_FRIDA then
+					ps = 12
+					pictNameTextile = "ui_color_textile_frida"
+				endif
+				if iTextileType = TEXTILE_LUCIA then
+					ps = 16
+					pictNameTextile = "ui_color_textile_lucia"
+				endif
+				if iTextileType = TEXTILE_BUCO then
+					ps = 25
+					pictNameTextile = "ui_color_textile_buco"
+				endif
+				if iTextileType = TEXTILE_VIKINGFJORD then
+					ps = 34
+					pictNameTextile = "ui_color_textile_vikingfjord"
+				endif
+				if iTextileType = TEXTILE_SMARTYPLUS then
+					ps = 52
+					pictNameTextile = "ui_color_textile_smarty_plus"
+				endif
+				if iTextileType = TEXTILE_GAJA then
+					ps = 59
+					pictNameTextile = "ui_color_textile_gaja"
+				endif
+				if iTextileType = TEXTILE_HALYCON1 then
+					ps = 68
+					pictNameTextile = "ui_color_textile_camira_halcyon_1"
+				endif
+				if iTextileType = TEXTILE_HALYCON2 then
+					ps = 88
+					pictNameTextile = "ui_color_textile_camira_halcyon_2"
+				endif
+				if iTextileType = TEXTILE_HALYCON3 then
+					ps = 108
+					pictNameTextile = "ui_color_textile_camira_halcyon_3"
+				endif
+				if iTextileType = TEXTILE_247 then
+					ps = 128
+					pictNameTextile = "ui_color_textile_24_7"
+				endif
+				if iTextileType = TEXTILE_BLOOMCYBER then
+					ps = 148
+					pictNameTextile = "ui_color_textile_bloom_cyber"
+				endif
+				if iTextileType = TEXTILE_BLOOMSCOOP then
+					ps = 152
+					pictNameTextile = "ui_color_textile_bloom_scoop"
+				endif
+	
+				!-------------------
+		
+				UI_STYLE 0, 1
+				UI_OUTFIELD stMaterialUI[9], x2+6, y, x4+hMatBox2-x3, 14, iFlag	 	UI_TOOLTIP stMaterialUI[9]		! Textile Type
+				UI_STYLE 0, 0
+				y = y + 15
+			
+				UI_SEPARATOR 0, 125, 225, 125
+			
+				UI_INFIELD{3} "TextileType", x2+6, y, hMatBox+40, vMatBox,
+					2,"",1,1,
+					needX, needY, pictX, pictY,
+					uiMatPict[2],	stTextileType[1],	 stTextileType[1],
+					uiMatPict[2],	stTextileType[2],	 stTextileType[2],
+					uiMatPict[2],	stTextileType[3],	 stTextileType[3],
+					uiMatPict[2],	stTextileType[4],	 stTextileType[4],
+					uiMatPict[2],	stTextileType[5],	 stTextileType[5],
+					uiMatPict[2],	stTextileType[6],	 stTextileType[6],
+					uiMatPict[2],	stTextileType[7],	 stTextileType[7],
+					uiMatPict[2],	stTextileType[8],	 stTextileType[8],
+					uiMatPict[2],	stTextileType[9],	 stTextileType[9],
+					uiMatPict[2],	stTextileType[10],	 stTextileType[10],
+					uiMatPict[2],	stTextileType[11],	 stTextileType[11],
+					uiMatPict[2],	stTextileType[12],	 stTextileType[12]		UI_TOOLTIP stMaterialUI[9]		! Textile Type
+
+			!--------------------------------------		
+			! -------2. oszlop---------------------
+			!--------------------------------------
+
+				x2 = 222
+				x3 = 242
+				x4 = 403
+			
+				y = yStart
+			
+				UI_STYLE 0, 1
+				if iElementType = ELEMENT_CHAIR then
+					UI_OUTFIELD stMaterialUI[10], x3, y, x4+hMatBox2-x3, 14, iFlag 	UI_TOOLTIP stMaterialUI[10]		! Upholstery Material
+				endif
+				UI_STYLE 0, 0
+				y = y + 15
+			
+		!			pS			= 0
+					pictName 	= pictNameTextile
+					rowNumber	= 3
+			
+				gosub "materialBack"
+				y = y + dy2
+			
+!!				UI_STYLE 0, 1
+!!				UI_OUTFIELD stMaterialUI[3], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[3]			! Seat Material
+!!				UI_STYLE 0, 0
+!!				y = y + 15
+!!			
+!!		!			pS			= 0
+!!					pictName 	= pictNameTextile
+!!					rowNumber	= 3
+!!			
+!!				gosub "materialSeat"
+!!				y = y + dy2
+!!			
+!!				UI_STYLE 0, 1
+!!				UI_OUTFIELD stMaterialUI[4], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[4]			! Arm Material
+!!				UI_STYLE 0, 0
+!!				y = y + 15
+!!			
+!!		!			pS			= 0
+!!					pictName 	= pictNameTextile
+!!					rowNumber	= 3
+!!			
+!!				gosub "materialArm"
+!!				y = y + dy2
+	
+			endif
+	
+		! ------------------------------------------------------------------------------
+		! PLASTIC
+		! ------------------------------------------------------------------------------
+	
+		if iPlasticType = PLASTIC_R48 then
+			ps = 158
+			pictNamePlastic = "ui_color_plastic_r45_r48"
+		endif
+		if iPlasticType = PLASTIC_CODA then
+			ps = 165
+			pictNamePlastic = "ui_color_plastic_coda"
+		endif	
+		if iPlasticType = PLASTIC_RIO then
+			ps = 170
+			pictNamePlastic = "ui_color_plastic_rio_samba"
+		endif			
+		if iPlasticType = PLASTIC_RIOJR then
+			ps = 177
+			pictNamePlastic = "ui_color_plastic_samba_rio_jr_mini"
+		endif			
+		if iPlasticType = PLASTIC_MOON then
+			ps = 181
+			pictNamePlastic = "ui_color_plastic_moon"
+		endif	
+		if iPlasticType = PLASTIC_PUBLIC then
+			ps = 187
+			pictNamePlastic = "ui_color_plastic_public"
+		endif	
+	
+		UI_STYLE 0, 1
+		UI_OUTFIELD stMaterialUI[11], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[11]				! Plastic Material
+		UI_STYLE 0, 0
+		y = y + 15
+		
+		!	pS			= 0
+			pictName 	= pictNamePlastic
+			rowNumber	= 3
+		
+		gosub "materialPlastic"
+		y = y + dy2		
+	
+		! ------------------------------------------------------------------------------
+		! WOOD
+		! ------------------------------------------------------------------------------
+		if iElementType = ELEMENT_TABLE then
+			UI_STYLE 0, 1
+			UI_OUTFIELD stMaterialUI[5], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[5]					! Wood Material
+			UI_STYLE 0, 0
+			y = y + 15
+			
+				pS			= woodStart-1
+				pictName 	= "ui_color_wood"
+				rowNumber	= 3
+			
+			gosub "materialWood"
+			y = y + dy2
+		else
+
+		endif
+		! ------------------------------------------------------------------------------
+		! STEEL
+		! ------------------------------------------------------------------------------
+		UI_STYLE 0, 1
+		UI_OUTFIELD stMaterialUI[6], x3, y, x4+hMatBox2-x3, 14 		UI_TOOLTIP stMaterialUI[6]					! Steel Material
+		UI_STYLE 0, 0
+		y = y + 15
+		
+			pS			= steelStart-1
+			pictName 	= "ui_color_steel"
+			rowNumber	= 3
+		
+		gosub "materialSteel"
+		y = y + dy2
+
+	endif
+endif
+
+
+! ==============================================================================
+!
+end ! end ! end ! end ! end ! end ! end ! end ! end ! end ! end ! end ! end ! end
+!
+! ==============================================================================
+
+! ==============================================================================
+! Subroutines
+! ==============================================================================
+
+
+! ------------------------------------------------------------------------------
+! Material Back
+! ------------------------------------------------------------------------------
+"materialBack":
+	UI_INFIELD "customMatBack", x4, y, hMatBox2, vMatBox				UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(backMatArray) = 1 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 2 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	 stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	 stMatBack[2]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 3 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 4 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 5 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 6 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 7 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 8 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 9 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 10 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 11 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			rowNumber*10,		stMatBack[11],	stMatBack[11]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 12 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 13 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 14 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 15 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 16 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 17 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16],
+			backMatArray[17]-pS,	stMatBack[17],	stMatBack[17]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 18 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16],
+			backMatArray[17]-pS,	stMatBack[17],	stMatBack[17],
+			backMatArray[18]-pS,	stMatBack[18],	stMatBack[18]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 19 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16],
+			backMatArray[17]-pS,	stMatBack[17],	stMatBack[17],
+			backMatArray[18]-pS,	stMatBack[18],	stMatBack[18],
+			backMatArray[19]-pS,	stMatBack[19],	stMatBack[19]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 20 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16],
+			backMatArray[17]-pS,	stMatBack[17],	stMatBack[17],
+			backMatArray[18]-pS,	stMatBack[18],	stMatBack[18],
+			backMatArray[19]-pS,	stMatBack[19],	stMatBack[19],
+			backMatArray[20]-pS,	stMatBack[20],	stMatBack[20]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(backMatArray) = 21 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			backMatArray[1]-pS,	stMatBack[1],	stMatBack[1],
+			backMatArray[2]-pS,	stMatBack[2],	stMatBack[2],
+			backMatArray[3]-pS,	stMatBack[3],	stMatBack[3],
+			backMatArray[4]-pS,	stMatBack[4],	stMatBack[4],
+			backMatArray[5]-pS,	stMatBack[5],	stMatBack[5],
+			backMatArray[6]-pS,	stMatBack[6],	stMatBack[6],
+			backMatArray[7]-pS,	stMatBack[7],	stMatBack[7],
+			backMatArray[8]-pS,	stMatBack[8],	stMatBack[8],
+			backMatArray[9]-pS,	stMatBack[9],	stMatBack[9],
+			backMatArray[10]-pS,	stMatBack[10],	stMatBack[10],
+			backMatArray[11]-pS,	stMatBack[11],	stMatBack[11],
+			backMatArray[12]-pS,	stMatBack[12],	stMatBack[12],
+			backMatArray[13]-pS,	stMatBack[13],	stMatBack[13],
+			backMatArray[14]-pS,	stMatBack[14],	stMatBack[14],
+			backMatArray[15]-pS,	stMatBack[15],	stMatBack[15],
+			backMatArray[16]-pS,	stMatBack[16],	stMatBack[16],
+			backMatArray[17]-pS,	stMatBack[17],	stMatBack[17],
+			backMatArray[18]-pS,	stMatBack[18],	stMatBack[18],
+			backMatArray[19]-pS,	stMatBack[19],	stMatBack[19],
+			backMatArray[20]-pS,	stMatBack[20],	stMatBack[20],
+			backMatArray[21]-pS,	stMatBack[21],	stMatBack[21]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+return
+
+! ------------------------------------------------------------------------------
+! Material Seat
+! ------------------------------------------------------------------------------
+"materialSeat":
+	UI_INFIELD "customMatSeat", x4, y, hMatBox2, vMatBox		UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(seatMatArray) = 1 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 2 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	 stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	 stMatSeat[2]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 3 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 4 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 5 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 6 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 7 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 8 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 9 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 10 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 11 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 12 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],stMatSeat[12]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 13 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],stMatSeat[13]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 14 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],stMatSeat[14]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 15 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],stMatSeat[15]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 16 then
+		UI_INFIELD{3} "matSeat", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],stMatSeat[16]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 17 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],	stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],	stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],	stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],	stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],	stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],	stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],	stMatSeat[16],
+			seatMatArray[17]-pS,	stMatSeat[17],	stMatSeat[17]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 18 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],	stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],	stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],	stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],	stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],	stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],	stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],	stMatSeat[16],
+			seatMatArray[17]-pS,	stMatSeat[17],	stMatSeat[17],
+			seatMatArray[18]-pS,	stMatSeat[18],	stMatSeat[18]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 19 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],	stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],	stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],	stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],	stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],	stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],	stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],	stMatSeat[16],
+			seatMatArray[17]-pS,	stMatSeat[17],	stMatSeat[17],
+			seatMatArray[18]-pS,	stMatSeat[18],	stMatSeat[18],
+			seatMatArray[19]-pS,	stMatSeat[19],	stMatSeat[19]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 20 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],	stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],	stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],	stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],	stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],	stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],	stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],	stMatSeat[16],
+			seatMatArray[17]-pS,	stMatSeat[17],	stMatSeat[17],
+			seatMatArray[18]-pS,	stMatSeat[18],	stMatSeat[18],
+			seatMatArray[19]-pS,	stMatSeat[19],	stMatSeat[19],
+			seatMatArray[20]-pS,	stMatSeat[20],	stMatSeat[20]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(seatMatArray) = 21 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			seatMatArray[1]-pS,	stMatSeat[1],	stMatSeat[1],
+			seatMatArray[2]-pS,	stMatSeat[2],	stMatSeat[2],
+			seatMatArray[3]-pS,	stMatSeat[3],	stMatSeat[3],
+			seatMatArray[4]-pS,	stMatSeat[4],	stMatSeat[4],
+			seatMatArray[5]-pS,	stMatSeat[5],	stMatSeat[5],
+			seatMatArray[6]-pS,	stMatSeat[6],	stMatSeat[6],
+			seatMatArray[7]-pS,	stMatSeat[7],	stMatSeat[7],
+			seatMatArray[8]-pS,	stMatSeat[8],	stMatSeat[8],
+			seatMatArray[9]-pS,	stMatSeat[9],	stMatSeat[9],
+			seatMatArray[10]-pS,	stMatSeat[10],	stMatSeat[10],
+			seatMatArray[11]-pS,	stMatSeat[11],	stMatSeat[11],
+			seatMatArray[12]-pS,	stMatSeat[12],	stMatSeat[12],
+			seatMatArray[13]-pS,	stMatSeat[13],	stMatSeat[13],
+			seatMatArray[14]-pS,	stMatSeat[14],	stMatSeat[14],
+			seatMatArray[15]-pS,	stMatSeat[15],	stMatSeat[15],
+			seatMatArray[16]-pS,	stMatSeat[16],	stMatSeat[16],
+			seatMatArray[17]-pS,	stMatSeat[17],	stMatSeat[17],
+			seatMatArray[18]-pS,	stMatSeat[18],	stMatSeat[18],
+			seatMatArray[19]-pS,	stMatSeat[19],	stMatSeat[19],
+			seatMatArray[20]-pS,	stMatSeat[20],	stMatSeat[20],
+			seatMatArray[21]-pS,	stMatSeat[21],	stMatSeat[21]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+return
+
+! ------------------------------------------------------------------------------
+! Material Arm
+! ------------------------------------------------------------------------------
+"materialArm":
+	UI_INFIELD "customMatArm", x4, y, hMatBox2, vMatBox				UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(armMatArray) = 1 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 2 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	 stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	 stMatArm[2]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 3 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 4 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 5 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 6 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 7 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 8 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 9 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 10 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 11 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 12 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 13 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 14 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 15 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 16 then
+		UI_INFIELD{3} "matArm", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 17 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16],
+			armMatArray[17]-pS,	stMatArm[17],	stMatArm[17]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 18 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16],
+			armMatArray[17]-pS,	stMatArm[17],	stMatArm[17],
+			armMatArray[18]-pS,	stMatArm[18],	stMatArm[18]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 19 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16],
+			armMatArray[17]-pS,	stMatArm[17],	stMatArm[17],
+			armMatArray[18]-pS,	stMatArm[18],	stMatArm[18],
+			armMatArray[19]-pS,	stMatArm[19],	stMatArm[19]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 20 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16],
+			armMatArray[17]-pS,	stMatArm[17],	stMatArm[17],
+			armMatArray[18]-pS,	stMatArm[18],	stMatArm[18],
+			armMatArray[19]-pS,	stMatArm[19],	stMatArm[19],
+			armMatArray[20]-pS,	stMatArm[20],	stMatArm[20]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(armMatArray) = 21 then
+		UI_INFIELD{3} "matBack", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			armMatArray[1]-pS,	stMatArm[1],	stMatArm[1],
+			armMatArray[2]-pS,	stMatArm[2],	stMatArm[2],
+			armMatArray[3]-pS,	stMatArm[3],	stMatArm[3],
+			armMatArray[4]-pS,	stMatArm[4],	stMatArm[4],
+			armMatArray[5]-pS,	stMatArm[5],	stMatArm[5],
+			armMatArray[6]-pS,	stMatArm[6],	stMatArm[6],
+			armMatArray[7]-pS,	stMatArm[7],	stMatArm[7],
+			armMatArray[8]-pS,	stMatArm[8],	stMatArm[8],
+			armMatArray[9]-pS,	stMatArm[9],	stMatArm[9],
+			armMatArray[10]-pS,	stMatArm[10],	stMatArm[10],
+			armMatArray[11]-pS,	stMatArm[11],	stMatArm[11],
+			armMatArray[12]-pS,	stMatArm[12],	stMatArm[12],
+			armMatArray[13]-pS,	stMatArm[13],	stMatArm[13],
+			armMatArray[14]-pS,	stMatArm[14],	stMatArm[14],
+			armMatArray[15]-pS,	stMatArm[15],	stMatArm[15],
+			armMatArray[16]-pS,	stMatArm[16],	stMatArm[16],
+			armMatArray[17]-pS,	stMatArm[17],	stMatArm[17],
+			armMatArray[18]-pS,	stMatArm[18],	stMatArm[18],
+			armMatArray[19]-pS,	stMatArm[19],	stMatArm[19],
+			armMatArray[20]-pS,	stMatArm[20],	stMatArm[20],
+			armMatArray[21]-pS,	stMatArm[21],	stMatArm[21]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+return
+
+! ------------------------------------------------------------------------------
+! Material Plastic
+! ------------------------------------------------------------------------------
+"materialPlastic":
+	UI_INFIELD "customMatPlastic", x4, y, hMatBox2, vMatBox				UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(plasticMatArray) = 1 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 2 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	 stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	 stMatPlastic[2]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 3 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 4 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 5 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 6 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 7 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 8 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 9 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 10 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 11 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 12 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11],
+			plasticMatArray[12]-pS,	stMatPlastic[12],	stMatPlastic[12]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 13 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11],
+			plasticMatArray[12]-pS,	stMatPlastic[12],	stMatPlastic[12],
+			plasticMatArray[13]-pS,	stMatPlastic[13],	stMatPlastic[13]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 14 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11],
+			plasticMatArray[12]-pS,	stMatPlastic[12],	stMatPlastic[12],
+			plasticMatArray[13]-pS,	stMatPlastic[13],	stMatPlastic[13],
+			plasticMatArray[14]-pS,	stMatPlastic[14],	stMatPlastic[14]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 15 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11],
+			plasticMatArray[12]-pS,	stMatPlastic[12],	stMatPlastic[12],
+			plasticMatArray[13]-pS,	stMatPlastic[13],	stMatPlastic[13],
+			plasticMatArray[14]-pS,	stMatPlastic[14],	stMatPlastic[14],
+			plasticMatArray[15]-pS,	stMatPlastic[15],	stMatPlastic[15]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(plasticMatArray) = 16 then
+		UI_INFIELD{3} "matPlastic", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			plasticMatArray[1]-pS,	stMatPlastic[1],	stMatPlastic[1],
+			plasticMatArray[2]-pS,	stMatPlastic[2],	stMatPlastic[2],
+			plasticMatArray[3]-pS,	stMatPlastic[3],	stMatPlastic[3],
+			plasticMatArray[4]-pS,	stMatPlastic[4],	stMatPlastic[4],
+			plasticMatArray[5]-pS,	stMatPlastic[5],	stMatPlastic[5],
+			plasticMatArray[6]-pS,	stMatPlastic[6],	stMatPlastic[6],
+			plasticMatArray[7]-pS,	stMatPlastic[7],	stMatPlastic[7],
+			plasticMatArray[8]-pS,	stMatPlastic[8],	stMatPlastic[8],
+			plasticMatArray[9]-pS,	stMatPlastic[9],	stMatPlastic[9],
+			plasticMatArray[10]-pS,	stMatPlastic[10],	stMatPlastic[10],
+			plasticMatArray[11]-pS,	stMatPlastic[11],	stMatPlastic[11],
+			plasticMatArray[12]-pS,	stMatPlastic[12],	stMatPlastic[12],
+			plasticMatArray[13]-pS,	stMatPlastic[13],	stMatPlastic[13],
+			plasticMatArray[14]-pS,	stMatPlastic[14],	stMatPlastic[14],
+			plasticMatArray[15]-pS,	stMatPlastic[15],	stMatPlastic[15],
+			plasticMatArray[16]-pS,	stMatPlastic[16],	stMatPlastic[16]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+return
+
+! ------------------------------------------------------------------------------
+! Material Wood
+! ------------------------------------------------------------------------------
+"materialWood":
+	UI_INFIELD "customMatWood", x4, y, hMatBox2, vMatBox				UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(woodMatArray) = 1 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 2 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	 stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	 stMatWood[2]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 3 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 4 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 5 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 6 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5],
+			woodMatArray[6]-pS,	stMatWood[6],	stMatWood[6]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 7 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5],
+			woodMatArray[6]-pS,	stMatWood[6],	stMatWood[6],
+			woodMatArray[7]-pS,	stMatWood[7],	stMatWood[7]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 8 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5],
+			woodMatArray[6]-pS,	stMatWood[6],	stMatWood[6],
+			woodMatArray[7]-pS,	stMatWood[7],	stMatWood[7],
+			woodMatArray[8]-pS,	stMatWood[8],	stMatWood[8]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 9 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5],
+			woodMatArray[6]-pS,	stMatWood[6],	stMatWood[6],
+			woodMatArray[7]-pS,	stMatWood[7],	stMatWood[7],
+			woodMatArray[8]-pS,	stMatWood[8],	stMatWood[8],
+			woodMatArray[9]-pS,	stMatWood[9],	stMatWood[9]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(woodMatArray) = 10 then
+		UI_INFIELD{3} "matWood", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			woodMatArray[1]-pS,	stMatWood[1],	stMatWood[1],
+			woodMatArray[2]-pS,	stMatWood[2],	stMatWood[2],
+			woodMatArray[3]-pS,	stMatWood[3],	stMatWood[3],
+			woodMatArray[4]-pS,	stMatWood[4],	stMatWood[4],
+			woodMatArray[5]-pS,	stMatWood[5],	stMatWood[5],
+			woodMatArray[6]-pS,	stMatWood[6],	stMatWood[6],
+			woodMatArray[7]-pS,	stMatWood[7],	stMatWood[7],
+			woodMatArray[8]-pS,	stMatWood[8],	stMatWood[8],
+			woodMatArray[9]-pS,	stMatWood[9],	stMatWood[9],
+			woodMatArray[10]-pS,	stMatWood[10],	stMatWood[10]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+return
+
+! ------------------------------------------------------------------------------
+! Material Steel
+! ------------------------------------------------------------------------------
+"materialSteel":
+	UI_INFIELD "customMatSteel", x4, y, hMatBox2, vMatBox				UI_TOOLTIP stMaterialUI[8]
+
+	if vardim1(steelMatArray) = 1 then
+		UI_INFIELD{3} "matSteel", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			rowNumber*10,		stMatSteel[1],	stMatSteel[1]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(steelMatArray) = 2 then
+		UI_INFIELD{3} "matSteel", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			steelMatArray[1]-pS,	stMatSteel[1],	 stMatSteel[1],
+			rowNumber*10,		stMatSteel[2],	 stMatSteel[2]		UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(steelMatArray) = 3 then
+		UI_INFIELD{3} "matSteel", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			steelMatArray[1]-pS,	stMatSteel[1],	stMatSteel[1],
+			steelMatArray[2]-pS,	stMatSteel[2],	stMatSteel[2],
+			rowNumber*10,		stMatSteel[3],	stMatSteel[3]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(steelMatArray) = 4 then
+		UI_INFIELD{3} "matSteel", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			steelMatArray[1]-pS,	stMatSteel[1],	stMatSteel[1],
+			steelMatArray[2]-pS,	stMatSteel[2],	stMatSteel[2],
+			steelMatArray[3]-pS,	stMatSteel[3],	stMatSteel[3],
+			rowNumber*10,		stMatSteel[4],	stMatSteel[4]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+
+	if vardim1(steelMatArray) = 5 then
+		UI_INFIELD{3} "matSteel", x3, y, hMatBox, vMatBox,
+			2,pictName,rowNumber*10,rowNumber,
+			needX, needY, pictX, pictY,
+			steelMatArray[1]-pS,	stMatSteel[1],	stMatSteel[1],
+			steelMatArray[2]-pS,	stMatSteel[2],	stMatSteel[2],
+			steelMatArray[3]-pS,	stMatSteel[3],	stMatSteel[3],
+			steelMatArray[4]-pS,	stMatSteel[4],	stMatSteel[4],
+			rowNumber*10,		stMatSteel[5],	stMatSteel[5]			UI_TOOLTIP stMaterialUI[5]
+		return
+	endif
+return
+
+! ------------------------------------------------------------------------------
+! Pla mentés miatt
+! ------------------------------------------------------------------------------
+!UI_PICT "ui_color_pes", 0, 0
+!UI_PICT "ui_color_spectrum", 0, 0
+!UI_PICT "ui_color_grp", 0, 0
+
+]]>
+</Script_UI>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_VL SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------------------
+! Upholstery Type
+! ------------------------------------------------------------------------------
+values "iUpholsteryType"	UPHOLSTERY_LEATHER,
+							UPHOLSTERY_TEXTILE
+
+values "UpholsteryType" stUpholsteryType
+
+if GLOB_MODPAR_NAME = "UpholsteryType" then
+	iUpholsteryType = 1
+	for i = 2 to vardim1(stUpholsteryType)
+		if UpholsteryType = stUpholsteryType[i] then
+			iUpholsteryType = i
+			i = vardim1(stUpholsteryType)
+		endif
+	next i
+	parameters iUpholsteryType = iUpholsteryType 
+else
+	iUpholsteryType = max(min(iUpholsteryType,vardim1(stUpholsteryType)),1)
+	parameters UpholsteryType = stUpholsteryType[iUpholsteryType]
+endif
+
+! ------------------------------------------------------------------------------
+! Leather Type
+! ------------------------------------------------------------------------------
+values "iLeatherType"	LEATHER_GRAIN,
+						LEATHER_FLOR
+
+values "LeatherType" stLeatherType
+
+if GLOB_MODPAR_NAME = "LeatherType" then
+	iLeatherType = 1
+	for i = 2 to vardim1(stLeatherType)
+		if LeatherType = stLeatherType[i] then
+			iLeatherType = i
+			i = vardim1(stLeatherType)
+		endif
+	next i
+	parameters iLeatherType = iLeatherType 
+else
+	iLeatherType = max(min(iLeatherType,vardim1(stLeatherType)),1)
+	parameters LeatherType = stLeatherType[iLeatherType]
+endif
+
+! ------------------------------------------------------------------------------
+! Textile Type
+! ------------------------------------------------------------------------------
+values "iTextileType"	TEXTILE_FRIDA,	
+						TEXTILE_LUCIA,		
+						TEXTILE_BUCO,		
+						TEXTILE_VIKINGFJORD,
+						TEXTILE_SMARTYPLUS,
+						TEXTILE_GAJA,
+						TEXTILE_HALYCON1,	
+						TEXTILE_HALYCON2,	
+						TEXTILE_HALYCON3,	
+						TEXTILE_247,	
+						TEXTILE_BLOOMCYBER,
+						TEXTILE_BLOOMSCOOP						
+
+values "TextileType" stTextileType
+
+if GLOB_MODPAR_NAME = "TextileType" then
+	iTextileType = 1
+	for i = 2 to vardim1(stTextileType)
+		if TextileType = stTextileType[i] then
+			iTextileType = i
+			i = vardim1(stTextileType)
+		endif
+	next i
+	parameters iTextileType = iTextileType 
+else
+	iTextileType = max(min(iTextileType,vardim1(stTextileType)),1)
+	parameters TextileType = stTextileType[iTextileType]
+endif
+
+! ------------------------------------------------------------------------------
+! Seat Padding Criteria
+! ------------------------------------------------------------------------------
+
+if iSeatPadding = SEATPAD_WO or iPlastic = 1 then
+	lock "iUpholsteryType", "UpholsteryType"
+	lock "iLeatherType", "LeatherType", "iTextileType", "TextileType"
+	lock "iMatBack", "matBack", "customMatBack"
+endif
+
+! ------------------------------------------------------------------------------
+! Plastic Type
+! ------------------------------------------------------------------------------
+values "iPlasticType"	PLASTIC_R48,
+						PLASTIC_CODA,
+						PLASTIC_RIO,
+						PLASTIC_RIOJR,
+						PLASTIC_MOON,
+						PLASTIC_PUBLIC			
+
+values "PlasticType" stPlasticType
+
+if GLOB_MODPAR_NAME = "PlasticType" then
+	iPlasticType = 1
+	for i = 2 to vardim1(stPlasticType)
+		if PlasticType = stPlasticType[i] then
+			iPlasticType = i
+			i = vardim1(stPlasticType)
+		endif
+	next i
+	parameters iPlasticType = iPlasticType 
+else
+	iPlasticType = max(min(iPlasticType,vardim1(stPlasticType)),1)
+	parameters PlasticType = stPlasticType[iPlasticType]
+endif
+
+! ------------------------------------------------------------------------------
+! Material Back
+! ------------------------------------------------------------------------------
+values "matBack" stMatBack
+values "iMatBack" backMatArray
+if GLOB_MODPAR_NAME = "matBack" or GLOB_MODPAR_NAME = "LeatherType" or GLOB_MODPAR_NAME = "TextileType" or GLOB_MODPAR_NAME = "UpholsteryType" then
+	iMatBack = backMatArray[1]
+	if matBack <> stMatBack[vardim1(stMatBack)] then
+		for i = 1 to vardim1(stMatBack)-1
+			if matBack= stMatBack[i] then
+				iMatBack = backMatArray[i]
+				i = vardim1(stMatBack)
+			endif
+		next i
+	else
+		iMatBack = 0
+	endif
+	parameters iMatBack = iMatBack
+else
+	iMatBack = MAX(MIN(iMatBack,vardim1(sMatName)),0)
+	if iMatBack = 0 then
+		parameters matBack = stMaterialUI[1]
+	else
+		parameters matBack = sMatName[iMatBack]
+	endif
+endif
+parameters backMatArray = backMatArray
+
+if iMatBack <> 0 then
+	hideparameter "customMatBack"
+	lock "customMatBack"
+endif
+
+
+! ------------------------------------------------------------------------------
+! Material Seat
+! ------------------------------------------------------------------------------
+values "matSeat" stMatSeat
+values "iMatSeat" seatMatArray
+if GLOB_MODPAR_NAME = "matSeat" or GLOB_MODPAR_NAME = "LeatherType" or GLOB_MODPAR_NAME = "TextileType" or GLOB_MODPAR_NAME = "UpholsteryType" then
+	iMatSeat = seatMatArray[1]
+	if matSeat <> stMatSeat[vardim1(stMatSeat)] then
+		for i = 1 to vardim1(stMatSeat)-1
+			if matSeat= stMatSeat[i] then
+				iMatSeat = seatMatArray[i]
+				i = vardim1(stMatSeat)
+			endif
+		next i
+	else
+		iMatSeat = 0
+	endif
+	parameters iMatSeat = iMatSeat
+else
+	iMatSeat = MAX(MIN(iMatSeat,vardim1(sMatName)),0)
+	if iMatSeat = 0 then
+		parameters matSeat = stMaterialUI[1]
+	else
+		parameters matSeat = sMatName[iMatSeat]
+	endif
+endif
+parameters seatMatArray = seatMatArray
+
+if iMatSeat <> 0 then
+	hideparameter "customMatSeat"
+	lock "customMatSeat"
+endif
+
+! ------------------------------------------------------------------------------
+! Material Arm
+! ------------------------------------------------------------------------------
+values "matArm" stMatArm
+values "iMatArm" armMatArray
+if GLOB_MODPAR_NAME = "matArm" or GLOB_MODPAR_NAME = "LeatherType" or GLOB_MODPAR_NAME = "TextileType" or GLOB_MODPAR_NAME = "UpholsteryType" then
+	iMatArm = armMatArray[1]
+	if matArm <> stMatArm[vardim1(stMatArm)] then
+		for i = 1 to vardim1(stMatArm)-1
+			if matArm= stMatArm[i] then
+				iMatArm = armMatArray[i]
+				i = vardim1(stMatArm)
+			endif
+		next i
+	else
+		iMatArm = 0
+	endif
+	parameters iMatArm = iMatArm
+else
+	iMatArm = MAX(MIN(iMatArm,vardim1(sMatName)),0)
+	if iMatArm = 0 then
+		parameters matArm = stMaterialUI[1]
+	else
+		parameters matArm = sMatName[iMatArm]
+	endif
+endif
+parameters armMatArray = armMatArray
+
+if iMatArm <> 0 then
+	hideparameter "customMatArm"
+	lock "customMatArm"
+endif
+
+! ------------------------------------------------------------------------------
+! Material Plastic
+! ------------------------------------------------------------------------------
+values "matPlastic" stMatPlastic
+values "iMatPlastic" plasticMatArray
+if GLOB_MODPAR_NAME = "matPlastic" or GLOB_MODPAR_NAME = "LeatherType" or GLOB_MODPAR_NAME = "TextileType" or GLOB_MODPAR_NAME = "UpholsteryType" then
+	iMatPlastic = plasticMatArray[1]
+	if matPlastic <> stMatPlastic[vardim1(stMatPlastic)] then
+		for i = 1 to vardim1(stMatPlastic)-1
+			if matPlastic= stMatPlastic[i] then
+				iMatPlastic = plasticMatArray[i]
+				i = vardim1(stMatPlastic)
+			endif
+		next i
+	else
+		iMatPlastic = 0
+	endif
+	parameters iMatPlastic = iMatPlastic
+else
+	iMatPlastic = MAX(MIN(iMatPlastic,vardim1(sMatName)),0)
+	if iMatPlastic = 0 then
+		parameters matPlastic = stMaterialUI[1]
+	else
+		parameters matPlastic = sMatName[iMatPlastic]
+	endif
+endif
+parameters plasticMatArray = plasticMatArray
+
+if iMatPlastic <> 0 then
+	hideparameter "customMatPlastic"
+	lock "customMatPlastic"
+endif
+
+! ------------------------------------------------------------------------------
+! Material Wood
+! ------------------------------------------------------------------------------
+values "matWood" stMatWood
+values "iMatWood" woodMatArray
+if GLOB_MODPAR_NAME = "matWood" then
+	iMatWood = woodMatArray[1]
+	if matWood <> stMatWood[vardim1(stMatWood)] then
+		for i = 1 to vardim1(stMatWood)-1
+			if matWood= stMatWood[i] then
+				iMatWood = woodMatArray[i]
+				i = vardim1(stMatWood)
+			endif
+		next i
+	else
+		iMatWood = 0
+	endif
+	parameters iMatWood = iMatWood
+else
+	iMatWood = MAX(MIN(iMatWood,vardim1(sMatName)),0)
+	if iMatWood = 0 then
+		parameters matWood = stMaterialUI[1]
+	else
+		parameters matWood = sMatName[iMatWood]
+	endif
+endif
+parameters woodMatArray = woodMatArray
+
+if iMatWood <> 0 then
+	hideparameter "customMatWood"
+	lock "customMatWood"
+endif
+
+! ------------------------------------------------------------------------------
+! Material Steel
+! ------------------------------------------------------------------------------
+values "matSteel" stMatSteel
+values "iMatSteel" steelMatArray
+if GLOB_MODPAR_NAME = "matSteel" then
+	iMatSteel = steelMatArray[1]
+	if matSteel <> stMatSteel[vardim1(stMatSteel)] then
+		for i = 1 to vardim1(stMatSteel)-1
+			if matSteel= stMatSteel[i] then
+				iMatSteel = steelMatArray[i]
+				i = vardim1(stMatSteel)
+			endif
+		next i
+	else
+		iMatSteel = 0
+	endif
+	parameters iMatSteel = iMatSteel
+else
+	iMatSteel = MAX(MIN(iMatSteel,vardim1(sMatName)),0)
+	if iMatSteel = 0 then
+		parameters matSteel = stMaterialUI[1]
+	else
+		parameters matSteel = sMatName[iMatSteel]
+	endif
+endif
+parameters steelMatArray = steelMatArray
+
+if iMatSteel <> 0 then
+	hideparameter "customMatSteel"
+	lock "customMatSteel"
+endif
+
+]]>
+</Script_VL>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Comment SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Comment>
+
+<ParamSection SectVersion="22" SectionFlags="0" SubIdent="0">
+	<ParamSectHeader>
+		<Version>22</Version>
+		<AutoHotspots>no</AutoHotspots>
+		<StatBits>
+			<STBit_FixSize/>
+		</StatBits>
+		<WDLeftFrame>0</WDLeftFrame>
+		<WDRightFrame>0</WDRightFrame>
+		<WDTopFrame>0</WDTopFrame>
+		<WDBotFrame>0</WDBotFrame>
+		<LayFlags>65535</LayFlags>
+		<WDMirrorThickness>0</WDMirrorThickness>
+		<WDWallInset>0</WDWallInset>
+		<SymbolColor>0</SymbolColor>
+	</ParamSectHeader>
+	<Parameters>
+		<Length Name="A">
+			<Description><![CDATA["A"]]></Description>
+			<Fix/>
+			<Value>1</Value>
+		</Length>
+		<Length Name="B">
+			<Description><![CDATA["B"]]></Description>
+			<Fix/>
+			<Value>1</Value>
+		</Length>
+		<Length Name="ZZYZX">
+			<Description><![CDATA["Height"]]></Description>
+			<Fix/>
+			<Value>1</Value>
+		</Length>
+		<Boolean Name="AC_show2DHotspotsIn3D">
+			<Description><![CDATA["2D hotspots in 3D"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Length Name="ac_bottomlevel">
+			<Description><![CDATA["Bottom level"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Length Name="ac_toplevel">
+			<Description><![CDATA["Top level"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Integer Name="iElementType">
+			<Description><![CDATA["Element Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iType">
+			<Description><![CDATA["Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iPlastic">
+			<Description><![CDATA["Plastic"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="iChairType">
+			<Description><![CDATA["ChairType"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iSeatPadding">
+			<Description><![CDATA["Seat Padding"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iBackType">
+			<Description><![CDATA["Back Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- iUpholsteryType: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="iUpholsteryType">
+			<Description><![CDATA["Upholstery Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="UpholsteryType">
+			<Description><![CDATA["UpholsteryType"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Leather"]]></Value>
+		</String>
+		<Integer Name="iFeetType">
+			<Description><![CDATA["Feet Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- iLeatherType: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="iLeatherType">
+			<Description><![CDATA["Leather Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="LeatherType">
+			<Description><![CDATA["Leather Type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Grain"]]></Value>
+		</String>
+
+		<!-- iTextileType: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="iTextileType">
+			<Description><![CDATA["Textile Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="TextileType">
+			<Description><![CDATA["Textile Type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Frida"]]></Value>
+		</String>
+
+		<!-- iPlasticType: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="iPlasticType">
+			<Description><![CDATA["Plastic Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="PlasticType">
+			<Description><![CDATA["Plastic Type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["R-45 or R-48"]]></Value>
+		</String>
+
+		<!-- uiPage: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="uiPage">
+			<Description><![CDATA["UI page"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<Integer Name="uiYStart">
+			<Description><![CDATA["UI y Start"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="uiXStart">
+			<Description><![CDATA["UI X Start"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>80</Value>
+		</Integer>
+		<Integer Name="uiXEnd">
+			<Description><![CDATA["UI X End"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>120</Value>
+		</Integer>
+
+		<!-- mat: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="mat">
+			<Description><![CDATA["Material Generator"]]></Description>
+		</Title>
+		<Integer Name="matNumber">
+			<Description><![CDATA["Material Number"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+
+		<!-- materials: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="materials">
+			<Description><![CDATA["Materials"]]></Description>
+		</Title>
+		<String Name="matBack">
+			<Description><![CDATA["Back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["07"]]></Value>
+		</String>
+		<Material Name="customMatBack">
+			<Description><![CDATA["Custom back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>72</Value>
+		</Material>
+		<Integer Name="iMatBack">
+			<Description><![CDATA["Back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="backMatArray">
+			<Description><![CDATA["Back Material Array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="7" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matSeat">
+			<Description><![CDATA["Seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["20"]]></Value>
+		</String>
+		<Material Name="customMatSeat">
+			<Description><![CDATA["Custom seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>97</Value>
+		</Material>
+		<Integer Name="iMatSeat">
+			<Description><![CDATA["Seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<Integer Name="seatMatArray">
+			<Description><![CDATA["Seat material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="7" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matArm">
+			<Description><![CDATA["Arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["69"]]></Value>
+		</String>
+		<Material Name="customMatArm">
+			<Description><![CDATA["Custom arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>97</Value>
+		</Material>
+		<Integer Name="iMatArm">
+			<Description><![CDATA["Arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>3</Value>
+		</Integer>
+		<Integer Name="armMatArray">
+			<Description><![CDATA["Arm material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="7" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matPlastic">
+			<Description><![CDATA["Plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Custom Material"]]></Value>
+		</String>
+		<Material Name="customMatPlastic">
+			<Description><![CDATA["Custom plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>97</Value>
+		</Material>
+		<Integer Name="iMatPlastic">
+			<Description><![CDATA["Plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="plasticMatArray">
+			<Description><![CDATA["Plastic material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="8" SecondDimension="0">
+				<AVal Row="1">159</AVal>
+				<AVal Row="2">160</AVal>
+				<AVal Row="3">161</AVal>
+				<AVal Row="4">162</AVal>
+				<AVal Row="5">163</AVal>
+				<AVal Row="6">164</AVal>
+				<AVal Row="7">165</AVal>
+				<AVal Row="8">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matWood">
+			<Description><![CDATA["Wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Custom Material"]]></Value>
+		</String>
+		<Material Name="customMatWood">
+			<Description><![CDATA["Custom wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>52</Value>
+		</Material>
+		<Integer Name="iMatWood">
+			<Description><![CDATA["Wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="woodMatArray">
+			<Description><![CDATA["Wood material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="7" SecondDimension="0">
+				<AVal Row="1">198</AVal>
+				<AVal Row="2">199</AVal>
+				<AVal Row="3">200</AVal>
+				<AVal Row="4">201</AVal>
+				<AVal Row="5">202</AVal>
+				<AVal Row="6">203</AVal>
+				<AVal Row="7">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matSteel">
+			<Description><![CDATA["Steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Black epoxy"]]></Value>
+		</String>
+		<Material Name="customMatSteel">
+			<Description><![CDATA["Custom steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>52</Value>
+		</Material>
+		<Integer Name="iMatSteel">
+			<Description><![CDATA["Steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>217</Value>
+		</Integer>
+		<Integer Name="steelMatArray">
+			<Description><![CDATA["Steel material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="3" SecondDimension="0">
+				<AVal Row="1">216</AVal>
+				<AVal Row="2">217</AVal>
+				<AVal Row="3">0</AVal>
+			</ArrayValues>
+		</Integer>
+	</Parameters>
+</ParamSection>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_FWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_FWM>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_BWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_BWM>
+
+<Copyright SectVersion="1" SectionFlags="0" SubIdent="0">
+	<Author>Éptár Kft. - Csányi Bence</Author>
+	<License>
+		<Type>Commercial</Type>
+		<Version></Version>
+	</License>
+</Copyright>
+
+<Keywords SectVersion="1" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Keywords>
+
+</Symbol>

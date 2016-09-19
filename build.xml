@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="Ncp" default="help" basedir=".">
+    <description>${ant.project.name} Compiler</description>
+
+<!--=======================
+	DEPENDENCIES
+	=======================-->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	<taskdef name="for" classname="net.sf.antcontrib.logic.ForTask"/>
+
+<!--=======================
+	PROPERTIES
+	=======================-->
+	<!-- Working Directories -->
+	<property name="build.dir"			location="../${ant.project.name}.build"/>
+	<property name="work.dir"			location="${build.dir}/_build"/>
+	<property name="gdllib_comp"		location="${work.dir}/gdlib_comp"/>
+	<property name="gdllib_loc"			location="${work.dir}/gdlib_loc"/>
+	<property name="gdllib_gsm"			location="${work.dir}/gdlib_gsm"/>
+	<property name="buildate"			location="${work.dir}/buildDate.xml"/>
+	<property name="svnFolder"			location="."/>
+	<property name="installer"			location="installer/win/client/contents/files"/>
+	<property name="pofiles"			location="${build.dir}/po"/>
+	
+	<!-- Library Directories -->
+	<property name="gdl_base_lang"		value="int"/>
+	<property name="gdl_base_codepage"	value="INT"/>
+	<property name="library-name"		value="${ant.project.name}"/>
+	<property name="gdl_additionallib"	location="${basedir}/additional_library"/>
+	<property name="gdl_base"			location="${basedir}/gdl"/>
+	<property name="gdl_dir"			location="${basedir}/gdl/library"/>
+	<property name="gdl_imgdir"			location="${basedir}/gdl/library_images"/>
+	<property name="gdl_strings"		location="${basedir}/gdl/library_strings"/>
+	<property name="gdl_dep"			location="${basedir}/gdl/library_dependency"/>
+	
+	<!-- Reverse Directories -->
+	<property name="gdl_reversebase"	location="../${library-name}.lib"/>
+	<property name="gdl_reversedir"		location="../${library-name}.src"/>
+	<property name="gdl_reverseimg"		location="../${library-name}.img"/>
+	
+	<!-- Binary utilities -->
+	<property name="bin"				location="${basedir}/bin"/>
+	<property name="lpxmlconv18"			location="${bin}/LP_XMLConverter_18/LP_XMLConverter.EXE"/>
+	<property name="gdlxmltool"			location="${bin}/gdlXmlTool.exe"/>
+	<property name="msgmerge"			location="${bin}/gettext-0.18.1/msgmerge.exe"/>
+	<property name="msgfmt"				location="${bin}/gettext-0.18.1/msgfmt.exe"/>
+
+
+<!--=======================
+	Get Current target
+	=======================-->
+	<scriptdef name="get-current-target-name" language="javascript">
+		<attribute name="property"/>
+		<![CDATA[
+		importClass( java.lang.Thread );
+
+		project.setProperty(
+			attributes.get( "property" ),
+			project.getThreadTask(
+				Thread.currentThread( ) ).getTask( ).getOwningTarget( ).getName( ) );
+		]]>
+	</scriptdef>
+
+
+<!--=======================
+	String Conversions
+	=======================-->
+	<scriptdef language="javascript" name="upper">
+		<attribute name="string" /> 
+		<attribute name="to" />
+
+		project.setProperty( attributes.get( "to" ),
+							 attributes.get( "string" ).toUpperCase() );
+	</scriptdef>
+
+	<scriptdef language="javascript" name="lower">
+		<attribute name="string" /> 
+		<attribute name="to" />
+
+		project.setProperty( attributes.get( "to" ),
+							 attributes.get( "string" ).toLowerCase() );
+	</scriptdef>
+
+	<scriptdef language="javascript" name="ucfirst">
+		<attribute name="string" /> 
+		<attribute name="to" />
+
+		var the_string = attributes.get( "string" );
+		project.setProperty( attributes.get( "to" ),
+					the_string.substr(0,1).toUpperCase() + the_string.substr(1) );
+	</scriptdef>
+
+	<scriptdef language="javascript" name="capitalize">
+		<attribute name="string" />
+		<attribute name="to" />
+
+		var s = new String( attributes.get( "string" ) );
+		project.setProperty( attributes.get( "to" ),
+				s.toLowerCase().replace( /^.|\s\S/g,
+				function(a) { return a.toUpperCase(); }) );
+	</scriptdef>
+
+
+<!--=======================
+	Use LP_XML Converter
+	=======================-->
+	<macrodef name="compile-gdllib">
+		<attribute name="location.src"	default="NOT SET"/>
+		<attribute name="location.trg"	default="NOT SET"/>
+		<attribute name="codepage"		default="NOT SET"/>
+		<attribute name="lang"			default="NOT SET"/>
+
+		<sequential>
+			<!--<mkdir dir="@{location.trg}"/> -->
+			<echo message="Make ${library-name}.${target}-@{lang}.@{codepage}"/>
+			<exec executable="${lpxmlconv18}" failonerror="yes" >
+				<arg line="makelibrary"/>
+				<arg line="-l @{codepage}"/>
+				<arg line="-check 8"/>
+				<arg line="-img ${gdl_imgdir}"/>
+				<arg line="@{location.src}"/>
+				<arg line="@{location.trg}"/>
+				<arg line="${gdl_additionallib}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+	
+<!--=======================
+	Localize XML folder
+	=======================-->
+	<macrodef name="localize-gdllib">
+		<attribute name="location.src" 	default="NOT SET"/>
+		<attribute name="location.trg" 	default="NOT SET"/>
+		<attribute name="lang"			default="NOT SET"/>
+	
+		<sequential>
+			<echo message="Localize ${library-name}.${target}-@{lang}"/>
+			<check-loc-skip lang="@{lang}"/>
+			<if>
+				<equals arg1="${gdl_base_lang}" arg2="@{lang}"/>
+				<then>
+					<echo message="Replace ${library-name}.${target}-@{lang}"/>
+					<exec executable="${gdlxmltool}" failonerror="yes" >
+						<arg line="-m replace"/>
+						<arg line="-i @{location.src}"/>
+						<arg line="-o @{location.trg}"/>
+						<arg line="${deplocation}"/>
+						<arg line="${depreplacer}"/>
+						<arg line="-r ${buildate}"/>
+						<arg line="${depgdlversion}"/>
+						<arg line="-v"/>
+						<arg line="-n"/>
+					</exec>
+				</then>
+				<else>
+					<echo message="Translate @{lang}.${target}"/>
+					<exec executable="${gdlxmltool}" failonerror="yes" >
+						<arg line="-m translate"/>
+						<arg line="-i @{location.src}"/>
+						<arg line="-o @{location.trg}"/>
+						<arg line="-p ${gdl_strings}/${library-name}-@{lang}.po"/>
+						<arg line="${depstringloc}"/>
+						<arg line="${depparamloc}"/>
+						<arg line="${depfileloc}"/>
+						<arg line="${deplocation}"/>
+						<arg line="${depreplacer}"/>
+						<arg line="-r ${buildate}"/>
+						<arg line="${depgdlversion}"/>
+						<arg line="-v"/>
+						<arg line="-n"/>
+						<arg line="-s"/>
+					</exec>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Compress XML folder
+	=======================-->
+	<macrodef name="compress-gdllib">
+		<attribute name="location.src" 	default="NOT SET"/>
+		<attribute name="location.trg"	default="NOT SET"/>
+		<attribute name="lang"			default="NOT SET"/>
+
+		<sequential>
+			<echo message="Compress ${library-name}.${target}-@{lang}"/>
+			<exec executable="${gdlxmltool}" failonerror="yes" >
+				<arg line="-m compress"/>
+				<arg line="-i @{location.src}"/>
+				<arg line="-o @{location.trg}"/>
+				<arg line="-t ${gdl_dep}/ScriptComment.txt"/>
+				<arg line="-e"/>
+				<arg line="-c 3"/>
+				<arg line="-n"/>
+				<arg line="-v"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Check Loc File Skip Params
+	=======================-->
+	<macrodef name="check-loc-skip">
+		<attribute name="lang"		default="NOT SET"/>
+
+		<sequential>
+			<if>
+				<available file="${gdl_dep}/version.xml" type="file"/>
+				<then>
+					<var name="depgdlversion" value="-r ${gdl_dep}/version.xml"/>
+				</then>
+				<else>
+					<var name="depgdlversion" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_dep}/date.xml" type="file"/>
+				<then>
+					<var name="depdatereverse" value="-r ${gdl_dep}/date.xml"/>
+				</then>
+				<else>
+					<var name="depdatereverse" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_dep}/dependence_@{lang}.xml" type="file"/>
+				<then>
+					<var name="deplocation" value="-r ${gdl_dep}/dependence_@{lang}.xml"/>
+				</then>
+				<else>
+					<var name="deplocation" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_strings}/skip_gdl_string.txt" type="file"/>
+				<then>
+					<var name="depstringloc" value="--ignore-strings  ${gdl_strings}/skip_gdl_string.txt"/>
+				</then>
+				<else>
+					<var name="depstringloc" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_strings}/skip_gdl_param.txt" type="file"/>
+				<then>
+					<var name="depparamloc" value="--ignore-param  ${gdl_strings}/skip_gdl_param.txt"/>
+				</then>
+				<else>
+					<var name="depparamloc" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_strings}/skip_gdl_filename.txt" type="file"/>
+				<then>
+					<var name="depfileloc" value="--ignore-filename  ${gdl_strings}/skip_gdl_filename.txt"/>
+				</then>
+				<else>
+					<var name="depfileloc" value=""/>
+				</else>
+			</if>
+			<if>
+				<available file="${gdl_strings}/replacer-@{lang}.xml" type="file"/>
+				<then>
+					<var name="depreplacer" value="-r ${gdl_strings}/replacer-@{lang}.xml"/>
+				</then>
+				<else>
+					<var name="depreplacer" value=""/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Build Language GSM
+	=======================-->
+	<macrodef name="build-lang">
+		<attribute name="lang"		default="NOT SET"/>
+		<attribute name="codepage"	default="NOT SET"/>
+		<attribute name="libname"	default="NOT SET"/>
+
+		<sequential>
+			<!--  Check Target is set -->
+			<fail message="Error: Target not set">
+				<condition>
+					<or>
+						<equals arg1="${target}" arg2=""/>
+						<not>
+							<isset property="target"/>
+						</not>
+					</or>
+				</condition>
+			</fail>
+
+			<!--  Check Library is set -->
+			<echo>Cleaning language @{lang}.${target}...</echo>
+			<if>
+				<available file="${work.dir}/${target}/@{lang}" type="dir"/>
+				<then>
+					<delete dir="${work.dir}/${target}/@{lang}"/>
+				</then>
+			</if>
+
+			<echo message="Compiling @{lang}.${target}..."/>
+
+			<!-- Localize XML folder -->
+			<localize-gdllib location.src="${gdl_dir}" location.trg="${gdllib_loc}/library.@{lang}.@{codepage}" lang="@{lang}"/>
+			
+			<!-- Compress XML folder -->
+			<var name="src" unset="true"/>
+			<var name="dest" unset="true"/>
+			<property name="dest"	location="${gdllib_gsm}/library.@{lang}.@{codepage}"/>
+			<if>
+				<equals arg1="${debug}" arg2="true"/>
+				<then>
+					<property name="src"	location="${gdllib_loc}/library.@{lang}.@{codepage}"/>
+				</then>
+				<else>
+					<property name="src"	location="${gdllib_comp}/library.@{lang}.@{codepage}"/>
+					<compress-gdllib location.src="${gdllib_loc}/library.@{lang}.@{codepage}" location.trg="${src}" lang="@{lang}"/>
+				</else>
+			</if>
+
+			<!-- Create GSM -->
+			<compile-gdllib location.src="${src}" location.trg="${dest}" codepage="@{codepage}" lang="@{lang}"/>
+
+			<!-- Create Zip -->
+			<ziplang lang="@{lang}" codepage="@{codepage}" libname="@{libname}"/>
+
+			<!-- Create LCF -->
+			<if>
+				<equals arg1="${debug}" arg2="false"/>
+				<then>
+					<create-LCF lang="@{lang}" codepage="@{codepage}" libname="@{libname}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	
+	
+<!--=======================
+	Check PO file
+	=======================-->
+	<macrodef name="check-po">
+		<attribute name="lang"		default="NOT SET"/>
+		<attribute name="location" 	default="NOT SET"/>
+
+		<sequential>
+			<echo message="Check PO file @{lang}..."/>
+			<exec executable="${msgfmt}" failonerror="yes" >
+				<arg line="--verbose"/>
+				<arg line="-c"/>
+				<arg line="@{location}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Update PO file
+	=======================-->
+	<macrodef name="update-po">
+		<attribute name="lang" default="NOT SET"/>
+
+		<sequential>
+			<echo message="Update PO file ${library-name}-@{lang}..."/>
+			<var name="src.po" unset="true"/>
+			<var name="ref.po" unset="true"/>
+			<if>
+				<available file="${build.dir}/${library-name}-${gdl_base_lang}.po" type="file"/>
+				<then>
+					<var name="ref.po"	value="${build.dir}/${library-name}-${gdl_base_lang}.po"/>
+				</then>
+				<else>
+					<var name="ref.po"	value="${gdl_strings}/${library-name}-${gdl_base_lang}.po"/>
+				</else>
+			</if>
+			<var name="src.po"	value="${gdl_strings}/${library-name}-@{lang}.po"/>
+			<!--<check-po lang="${gdl_base_lang}" location="${ref.po}"/>-->
+			<!--<check-po lang="@{lang}" location="${src.po}"/>-->
+			<!--<echo message="Merge PO file ${library-name}-@{lang}..."/>-->
+			<upper string="@{lang}" to="upper" />
+			<exec executable="${msgmerge}" failonerror="yes" >
+				<arg line="--verbose"/>
+				<arg line="--no-fuzzy-matching"/>
+				<arg line="--previous"/>
+				<arg line="--no-wrap"/>
+				<arg line="--lang=${upper}"/>
+				<arg line="-o ${pofiles}/${library-name}-@{lang}.po"/>
+				<arg line="${src.po}"/>
+				<arg line="${ref.po}"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Zipping finished files
+	=======================-->
+	<macrodef name="ziplang">
+		<attribute name="lang"		default="NOT SET"/>
+		<attribute name="codepage"	default="NOT SET"/>
+		<attribute name="libname"	default="NOT SET"/>
+
+		<sequential>
+			<echo message="Zipping ${library-name}.${target}-@{lang}..."/>
+			<delete dir="${build.dir}/${target}/@{lang}"/>
+			<copy todir="${build.dir}/${target}/@{lang}/@{libname}" overwrite="true">
+				<fileset dir="${gdllib_gsm}/library.@{lang}.@{codepage}"/>
+			</copy>
+
+			<zip destfile="${build.dir}/${target}/${library-name}_library_@{lang}.zip" basedir="${build.dir}/${target}/@{lang}/@{libname}"/>
+		</sequential>
+	</macrodef>	
+
+
+<!--=======================
+	Create LCF files
+	=======================-->
+	<macrodef name="create-LCF">
+		<attribute name="lang"		default="NOT SET"/>
+		<attribute name="codepage"	default="NOT SET"/>
+		<attribute name="libname"	default="NOT SET"/>
+
+		<sequential>
+			<echo message="Create LCF file ${library-name}.${target}-@{lang}..."/>
+			<var name="lcf_folder" unset="true"/>
+			<var name="lcf_name" unset="true"/>
+			<var name="lcf_location" unset="true"/>
+
+			<propertyregex property="lcf_name" input="@{libname}" regexp=" " replace="_" global="true" defaultvalue="@{libname}"/>
+			<var name="lcf_folder"		value="${build.dir}/${target}/@{lang}/@{libname}"/>
+			<var name="lcf_location"	value="${build.dir}/${target}/${lcf_name}.lcf"/>
+
+			<exec executable="${lpxmlconv18}" failonerror="yes" >
+				<arg line="createcontainer"/>
+				<arg line="'${lcf_location}'"/>
+				<arg line="'${lcf_folder}'"/>
+			</exec>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Create Log File
+	=======================-->
+	<macrodef name="create-log">
+		<sequential>
+			<mkdir dir="${build.dir}"/>
+			<tstamp>
+				<format property="timestamp" pattern="yyyy-MM-dd_HH-mm-ss"/>
+			</tstamp>
+			<property name="build.log.dir" location="${build.dir}/log"/>
+			<mkdir dir="${build.log.dir}"/>
+			<property name="build.log.filename" value="build_${timestamp}.log"/>
+			<record name="${build.log.dir}/${build.log.filename}"
+				loglevel="verbose" append="false"/>
+			<echo message="Build logged to ${build.log.filename}"/>
+		</sequential>
+	</macrodef>
+
+
+<!--=======================
+	Create Build Date File
+	=======================-->
+	<macrodef name="create-library-date">
+		<sequential>
+			<local name="buildTime"/>
+			<tstamp>
+				<format property="buildTime" pattern="yyyy.MM.dd"/>
+			</tstamp>
+			<echo file="${buildate}" append="false"><![CDATA[<?xml version="1.0"  encoding="UTF-8"?>
+<language>		
+<str id="buildDate"	value="]]>${buildTime}<![CDATA["></str>
+</language>]]>
+			</echo>
+		</sequential>
+	</macrodef>	
+
+
+	
+<!--=======================
+	INIT
+	=======================-->
+	<target name="init">
+		<echo>Ant Encoding : ${file.encoding}</echo>
+
+		<!-- Build Log -->
+		<create-log/>
+
+		<!-- Clean Work Dir -->
+		<if>
+			<available file="${work.dir}" type="dir"/>
+			<then>
+				<delete dir="${work.dir}"/>
+			</then>
+		</if>
+
+		<!-- Create Folders -->
+		<mkdir dir="${work.dir}"/>
+		<mkdir dir="${gdllib_comp}"/>
+		<mkdir dir="${gdllib_gsm}"/>
+		<mkdir dir="${gdllib_loc}"/>
+
+		<!-- Generate build time stamp -->
+		<create-library-date/>
+	</target>
+
+
+<!--=======================
+	LANGUAGE VERSIONS
+	=======================-->
+	<target name="int" depends="init">
+		<build-lang lang="int" codepage="INT" libname="${ant.project.name}"/>
+	</target>
+
+
+<!--=======================
+	TARGETS
+	=======================-->
+	
+	<target name="debug">
+		<property name="debug" value="true"/>
+		<property name="target" value="debug"/>
+		<echo>Set target: ${target}</echo>
+		<antcall target="int"/>
+	</target>
+
+	<target name="release">
+		<property name="debug" value="false"/>
+		<property name="target" value="release"/>
+		<echo>Set target: ${target}</echo>
+		<antcall target="int"/>
+	</target>
+
+	<target name="create-translation">
+		<echo message="Collecting Strings..."/>
+		<mkdir dir="${build.dir}"/>
+		<exec executable="${gdlxmltool}" failonerror="yes" >
+			<arg line="-m collect"/>
+			<arg line="-i ${gdl_dir}"/>
+			<arg line="-p ${build.dir}/${library-name}-${gdl_base_lang}.po"/>
+			<arg line="--ignore-strings ${gdl_strings}/skip_gdl_string.txt"/>
+			<arg line="--ignore-param ${gdl_strings}/skip_gdl_param.txt"/>
+			<arg line="--ignore-filename ${gdl_strings}/skip_gdl_filename.txt"/>
+			<arg line="-d 0"/>
+			<arg line="-v"/>
+			<arg line="-n"/>
+			<arg line="-s"/>
+		</exec>
+	</target>
+
+	<target name="update-translation">
+		<mkdir dir="${pofiles}"/>
+		<update-po lang="int"/>
+	</target>
+
+	<target name="clean">
+		<if>
+			<available file="${build.dir}" type="dir"/>
+			<then>
+				<echo>Cleaning ${build.dir} folder..."</echo>
+				<delete includeemptydirs="true">
+					<fileset dir="${build.dir}" includes="**/*"/>
+				</delete>
+			</then>
+			<else>
+				<echo>${build.dir} missing"</echo>
+			</else>
+		</if>
+	</target>
+
+	<target name="reverse" depends="init">
+		<if>
+			<available file="${gdl_reversedir}" type="dir"/>
+			<then>
+				<delete dir="${gdl_reversedir}"/>
+			</then>
+		</if>
+		
+		<echo message="Reverse ${library-name} (LP_XMLConverter)..."/>
+		<check-loc-skip lang="${gdl_base_lang}"/>
+		
+		<exec executable="${lpxmlconv18}" failonerror="yes" >
+			<arg line="l2x"/>
+			<arg line="-l ${gdl_base_codepage}"/>
+			<arg line="${gdl_reversebase}"/>
+			<arg line="${gdl_reversedir}"/>
+		</exec>
+
+		<echo message="Reverse ${library-name} (gdlXmlTool)..."/>
+		<exec executable="${gdlxmltool}" failonerror="yes" >
+			<arg line="-m reverse"/>
+			<arg line="-i ${gdl_reversedir}"/>
+			<arg line="--img ${gdl_imgdir}"/>
+			<arg line="--revimg ${gdl_reverseimg}"/>
+			<arg line="${deplocation}"/>
+			<arg line="${depdatereverse}"/>
+			<arg line="${depgdlversion}"/>
+			<arg line="-n"/>
+			<arg line="-v"/>
+		</exec>
+	</target>
+
+	<target name="help">
+		<echo>Available compile options:</echo>
+		<echo>clean		Clean .build folder</echo>
+		<echo>debug		Set target to Debug mode</echo>
+		<echo>release		Set target to Release mode</echo>
+		<echo>int			Build INT language version</echo>
+		<echo>all			Build ALL language version</echo>
+		<echo>reverse		Reverse</echo>
+		<echo>install		Copy builded library to your installer folder</echo>
+		<echo>create-translation	Create localizable .PO file</echo>
+		<echo>update-translation	Update localized .PO files</echo>
+		<echo></echo>
+		<echo>Sample: build release all</echo>
+	</target>
+
+</project>

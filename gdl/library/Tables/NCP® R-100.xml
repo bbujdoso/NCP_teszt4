@@ -1,0 +1,1772 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Symbol IsArchivable="no" IsPlaceable="yes" MainGUID="9779C31F-9F1E-4ED9-B930-BFF8A0970B19" MigrationValue="Normal" Owner="1196638531" Signature="1196644685" Version="34">
+<Ancestry SectVersion="1" SectionFlags="0" SubIdent="0" Template="no">
+	<MainGUID>F938E33A-329D-4A36-BE3E-85E126820996</MainGUID>
+	<MainGUID>103E8D2C-8230-42E1-9597-46F84CCE28C0</MainGUID>
+</Ancestry>
+
+<CalledMacros SectVersion="2" SectionFlags="0" SubIdent="0">
+	<Macro>
+		<MName><![CDATA["ncp_materials"]]></MName>
+		<MainGUID>431E8D26-C0AE-4C7E-8D1A-FDDC05518D98</MainGUID>
+	</Macro>
+	<Macro>
+		<MName><![CDATA["ncp_text_label"]]></MName>
+		<MainGUID>FD7E2734-952A-487F-A02A-243896579B0C</MainGUID>
+	</Macro>
+</CalledMacros>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_3D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------
+! General
+! ------------------------------------------------------------------
+if iDetLevel3D = DET3D_NONE then end
+if not(gs_shadow) then shadow off
+resol gs_resol
+pen pen_3D
+
+unID = 1
+
+! ------------------------------------------------------------------
+! Materials
+! ------------------------------------------------------------------
+
+IF iMatSteel <> 0 THEN
+	matNumber = iMatSteel
+	gosub "materialData"
+else 
+	qq = REQUEST ("Name_of_material", customMatSteel, matSteel)
+ENDIF
+
+! ------------------------------------------------------------------
+! Hotspots
+! ------------------------------------------------------------------
+
+hotspot 	0,		0, 		0,		unID	: unID = unID +1
+hotspot 	-A/2,	0, 		ZZYZX,		unID	: unID = unID +1
+hotspot 	A/2,	0, 		ZZYZX,		unID	: unID = unID +1
+hotspot 	0,		-B/2, 	ZZYZX,		unID	: unID = unID +1
+hotspot 	0,		B/2, 	ZZYZX,		unID	: unID = unID +1
+
+!--legs--
+hotspot 	-0.1,	0.435, 		0,		unID	: unID = unID +1
+hotspot 	-0.327,	-0.304, 	0,		unID	: unID = unID +1
+hotspot 	0.427,	-0.13, 		0,		unID	: unID = unID +1
+
+! ------------------------------------------------------------------
+! Block and END!!
+! ------------------------------------------------------------------
+
+if iDetLevel3D = DET3D_BLOCK then
+	add -A/2, -B/2, 0
+		block A, B, ZZYZX
+	del 1
+	
+	end
+endif
+
+! ------------------------------------------------------------------
+! TableTop
+! ------------------------------------------------------------------
+material matGlass
+add 0, 0, 0.44
+roty 90
+	revolve 8, 360, 16+32,
+        0,            0,      1, 
+        7.715274834628E-017,         0.42,      1, 
+              0.0031,        0.435,      1, 
+              0.0031,         0.45,      1, 
+              0.0069,         0.45,      1, 
+              0.0069,        0.435,      1, 
+                0.01,         0.42,      1, 
+                0.01, -1.836970198721E-018,      1
+del 2
+
+! ------------------------------------------------------------------
+! Legs
+! ------------------------------------------------------------------
+material matSteel
+add 0.05, 0.064, 0
+	gosub "EnigmaLeg"
+del 0
+
+! ==============================================================================
+!
+end !END	END		END		END
+!
+! ==============================================================================
+
+
+! ------------------------------------------------------------------
+! Subroutines
+! ------------------------------------------------------------------
+
+"EnigmaLeg":
+
+return
+
+]]>
+</Script_3D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_2D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------
+! General
+! ------------------------------------------------------------------
+fill gs_fill_type
+pen pen_2D
+if iSymbolDet = 1 then bDetail2D = (GLOB_SCALE < 101)
+if iSymbolDet = 2 then bDetail2D = 0
+if iSymbolDet = 3 then bDetail2D = 1
+
+unID = 100
+
+! ------------------------------------------------------------------
+! Hotspots
+! ------------------------------------------------------------------
+hotspot2 	0,		0, 		unID	: unID = unID +1
+hotspot2 	0,	-B/2, 		unID	: unID = unID +1
+hotspot2 	A/2,	0, 		unID	: unID = unID +1
+hotspot2 	0,	B/2, 		unID	: unID = unID +1
+hotspot2 	-A/2,	0, 		unID	: unID = unID +1
+
+! ------------------------------------------------------------------
+! Symbol
+! ------------------------------------------------------------------
+
+poly2_b 2, 7, gs_fill_pen, gs_back_pen,
+	0, 0, 901,
+	A/2, 360, 4001
+
+!project2 3, 270, 1
+
+! ------------------------------------------------------------------------------
+! 2D Text
+! ------------------------------------------------------------------------------
+if txt_2D then
+	call "ncp_text_label" parameters all		txt_1	= txt_1,
+												txt_2	= txt_2,
+												txt_3	= txt_3
+endif
+
+
+]]>
+</Script_2D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_1D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------
+! Variables
+! ------------------------------------------------------------------
+eps = 0.0001
+ns	= NSP
+
+! ------------------------------------------------------------------
+! Sizes
+! ------------------------------------------------------------------
+A 		= 0.9
+B 		= 0.9
+ZZYZX 	= 0.44
+
+! ------------------------------------------------------------------------------
+! Localization
+! ------------------------------------------------------------------------------
+
+dim stStyleUI[]
+	stStyleUI[1]		= `Chair Type`
+	stStyleUI[2]		= `Size Type`
+	stStyleUI[3]		= `Back Type`
+	stStyleUI[4]		= `Feet Holder`
+	stStyleUI[5]		= `Seat Number`
+	stStyleUI[6]		= `Plastic`
+	stStyleUI[7]		= `Feet Type`
+	stStyleUI[8]		= `Armrest`
+	stStyleUI[9]		= `placeholder`
+	stStyleUI[10]		= `placeholder`
+
+dim stElementType[]
+	stElementType[1]	= `Chair`
+	stElementType[2]	= `Sofa`
+	stElementType[3]	= `Table`
+
+! ------------------------------------------------------------------------------
+! Bemenö adatok:
+
+!	ElementType:
+!	iElementType:						Elem típusa
+		ELEMENT_CHAIR		= 1			!Szék
+		ELEMENT_SOFA		= 2			!Kanapé
+		ELEMENT_TABLE		= 3			!Asztal
+
+!	Type:
+!	iType:								Típus
+		TYPE_CODA			= 1			!Coda
+		TYPE_PUBLIC			= 2			!Public
+		TYPE_PUBLICBARSTOL	= 3			!Public Barstool
+		TYPE_RIO			= 4			!Rio
+		TYPE_RIOBARSTOL		= 5			!Rio Barstool
+		TYPE_RIOMINI		= 6			!Rio Z Junior og Mini
+		TYPE_RIOJUNIOR		= 7			!Rio Junior
+		TYPE_R48			= 8			!R-48
+		TYPE_FAVN			= 9			!Favn
+
+		TYPE_SAMBA			= 21		!Samba 
+		TYPE_SAMBAJUNIOR	= 22		!Samba junior
+
+		TYPE_R60C			= 31		!R-60c table
+		TYPE_NORDICLIGHT	= 32 		!Nordic Light table
+		TYPE_HUB			= 33 		!HUB table
+		TYPE_R80			= 34 		!R-80 table
+		TYPE_R100 			= 35 		!R-100 table
+
+! ------------------------------------------------------------------------------
+! Options
+! ------------------------------------------------------------------------------
+
+!	LegType:
+!	iLegType:							Láb típusa
+		NORMAL_LEG			= 1			!Kerék nélküli
+		OFFICE_LEG			= 2			!Kerekes
+
+!	ChairType
+!	iChairType
+		CHAIR_TYPE1			= 1 		! 1
+		CHAIR_TYPE2			= 2 		! 2
+		CHAIR_TYPE3			= 3 		! 3
+		CHAIR_TYPE4			= 4 		! 4
+
+!	SizeType
+!	iSizeType
+		SIZE_SMALL			= 1 		!Small
+		SIZE_MEDIUM			= 2 		!Medium
+		SIZE_LARGE			= 3 		!Large
+
+!	BackType
+!	iBackType
+		HIGH_BACK			= 1 		!High Back
+		LOW_BACK			= 2 		!Low Back
+
+!	Linking
+!	iLinking
+		LINKING_ON			= 1 		!Enabled
+		LINKING_OFF			= 2 		!Disabled
+
+!	Armrest
+!	iArmrest
+		ARMREST_ON			= 1 		!Enabled
+		ARMREST_OFF			= 2 		!Disabled
+
+!	FeetType:
+!	iFeetType:
+		FEET_STEEL			= 1 		!Steel
+		FEET_WOOD			= 2 		!Wood
+
+!	FeetHolder:
+!	iFeetHolder:
+		FEET_ON				= 1 		!Enabled
+		FEET_OFF			= 2 		!Disabled
+
+! ------------------------------------------------------------------------------
+! Materials
+! ------------------------------------------------------------------------------
+	
+!	UpholsteryType:
+!	iUpholsteryType:
+		UPHOLSTERY_LEATHER	= 1 		!Leather
+		UPHOLSTERY_TEXTILE	= 2 		!Textil
+
+!	LeatherType:
+!	iLeatherType:
+		LEATHER_GRAIN		= 1 		!Grain
+		LEATHER_FLOR		= 2 		!Flor
+
+!	TextileType:
+!	iTextileType:
+		TEXTILE_FRIDA		= 1 		!Frida
+		TEXTILE_LUCIA		= 2 		!Lucia
+		TEXTILE_BUCO		= 3 		!Buco
+		TEXTILE_VIKINGFJORD	= 4			!Vikingfjord
+		TEXTILE_SMARTYPLUS	= 5			!Smarty Plus
+		TEXTILE_GAJA		= 6			!Gaja
+		TEXTILE_HALYCON1	= 7			!Camira Halycon 1
+		TEXTILE_HALYCON2	= 8			!Camira Halycon 2
+		TEXTILE_HALYCON3	= 9			!Camira Halycon 3
+		TEXTILE_247			= 10		!24/7
+		TEXTILE_BLOOMCYBER	= 11		!Bloom Cyber
+		TEXTILE_BLOOMSCOOP	= 12		!Bloom Scoop
+
+!	PlasticType:
+!	iPlasticType:
+		PLASTIC_R48			= 1 		!R-45 or R-48
+		PLASTIC_CODA		= 2 		!Coda
+		PLASTIC_RIO			= 3 		!Rio or Samba
+		PLASTIC_RIOJR		= 4 		!Samba or Rio Jr or Mini 
+		PLASTIC_MOON		= 5 		!Moon
+		PLASTIC_PUBLIC		= 6 		!Public
+
+! ------------------------------------------------------------------------------
+
+! iDetLevel3D
+	DET3D_NONE		= 1
+	DET3D_BLOCK		= 2
+	DET3D_DETAILED	= 3
+
+dim stDetLevel3D[]
+	stDetLevel3D[1]	= `None`
+	stDetLevel3D[2]	= `Block`
+	stDetLevel3D[3]	= `Detailed`
+
+dim stSymbolDet[]
+	stSymbolDet[1] = `Scale sensitive`
+	stSymbolDet[2] = `Always Simple`
+	stSymbolDet[3] = `Always Detailed`
+
+! ==============================================================================
+! Standalone Material Definitions
+! ==============================================================================
+
+define material	"matGlass" 20,
+	0.8709804, 0.93627451, 0.9754902,
+	0.8, 0.7, 1, 0.25,
+	92, 0,
+	1, 1, 1,
+	0, 0, 0,
+	0, 0, 1, 0
+
+! ------------------------------------------------------------------
+! 2D Text
+! ------------------------------------------------------------------
+
+txt_1 = `Enigma Table`
+txt_2 = "90 x 90 x 45 cm"
+txt_3 = ""
+
+! ==============================================================================
+!
+! End of Master Script
+!
+! ==============================================================================
+
+goto "endMasterScript"
+
+! ==============================================================================
+!
+! Subrutines
+!
+! ==============================================================================
+
+
+! ==============================================================================
+! Get Material Data
+! ==============================================================================
+! Input:
+!	matNumber:		Material Number
+! Output:
+!	define material
+! ==============================================================================
+"materialData":
+	matName= ""
+	texName= ""
+	DIM cRGB[3]
+	DIM sRGB[3]
+
+	call "ncp_materials"		parameters matNumber = matNumber \
+								returned_parameters matName, texName,
+								cRGB, sRGB, 
+								amb, diff, spect, trans, shin,  tatte, eatte,
+								LWA_amb, LWA_diff
+
+	if texName = "" then
+		define material matName 0,
+			cRGB[1], cRGB[2], cRGB[3], 		! RGB
+			amb, diff, spect, trans,	 	! amb., diff., specular, transp.! coeff.-s
+			shin, tatte, 					! shining, transparency att. 
+			sRGB[1], sRGB[2], sRGB[3], 		! Specular RGB 
+			0, 0, 0, 						! Emission RGB 
+			eatte							! Emission attenuation
+	else
+		define texture matName texName,  0.3, 0.3, 2, 0
+		define material matName 20,
+			cRGB[1], cRGB[2], cRGB[3], 		! RGB
+			amb, diff, spect, trans, 		! amb., diff., specular, transp. !coeff.-s
+			shin, tatte, 					! shining, transparency att. 
+			sRGB[1], sRGB[2], sRGB[3], 		! Specular RGB 
+			0, 0, 0,						! Emission RGB
+			0,								! Emission attenuation
+			0, 1,IND (TEXTURE, matName)		! Fill, Fill color, Texture
+	endif
+return
+
+! ==============================================================================
+!
+! End of Master Script
+!
+! ==============================================================================
+
+"endMasterScript":
+
+]]>
+</Script_1D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_PR SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================]]>
+</Script_PR>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_UI SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+! ------------------------------------------------------------------------------
+! Localization
+! ------------------------------------------------------------------------------
+dim buttonText[]
+	buttonText[1] = `Style`
+	buttonText[2] = `Materials`
+	buttonText[3] = `Presentation`
+
+dim stAttributes[]
+	stAttributes[1] = `Realistic Colours`
+	stAttributes[2] = `Contour Pen`
+	stAttributes[3] = `Fill Type`
+	stAttributes[4] = `Fill Pen`
+	stAttributes[5] = `Fill Background Pen`
+	stAttributes[6] = `Textbox in 2D`
+	stAttributes[7] = `Font Size (mm)`
+	stAttributes[8] = `Font Pen`
+	stAttributes[9] = `Font Style`
+	stAttributes[10] = `Bold`
+	stAttributes[11] = `Italic`
+	stAttributes[12] = `Underline`
+	stAttributes[13] = `Pen 3D`
+	stAttributes[14] = `Resolution`
+	stAttributes[15] = `2D Representation`
+	stAttributes[16] = `3D Representation`
+
+! ------------------------------------------------------------------------------
+! Picture Data
+! ------------------------------------------------------------------------------
+DIM uiProductPict[]
+	uiProductPict[1]	= "ui_upholstery_leather"			!CSAK TESZT
+
+DIM uiPict[]
+	uiPict[1]	= 101		!NCP_background.jpg
+	uiPict[2]	= 102		!NCP_button_mat_a.png
+	uiPict[3]	= 103		!NCP_button_mat_b.jpg
+	uiPict[4]	= 104		!NCP_button_prez_a.png
+	uiPict[5]	= 105		!NCP_button_prez_b.png
+	uiPict[6]	= 106		!NCP_button_style_a.png
+	uiPict[7]	= 107		!NCP_button_style_b.png
+	uiPict[8]	= 108		!NCP_ekornes_logo.png
+
+	uiPict[9]	= 109		!NCP_ui_2d_pen.png
+	uiPict[10]	= 110		!NCP_ui_2d_pen_lock.png
+	uiPict[11]	= 111		!NCP_ui_3d_pen.png
+	uiPict[12]	= 112		!NCP_ui_3d_pen_lock.png
+	uiPict[13]	= 113		!NCP_ui_back_pen.png
+	uiPict[14]	= 114		!NCP_ui_back_pen_lock.png
+	uiPict[15]	= 115		!NCP_felsocsik.png
+
+	uiPict[16]	= 116		!NCP_ui_fill_pen.png
+	uiPict[17]	= 117		!NCP_ui_fill_pen_lock.png
+	uiPict[18]	= 118		!NCP_ui_fill_type.png
+	uiPict[19]	= 119		!NCP_ui_fill_type_lock.png
+
+	uiPict[20]	= 120		!NCP_ui_resol.png
+
+	uiPict[21]	= 121		!NCP_ui_text_bold.png
+	uiPict[22]	= 122		!NCP_ui_text_italic.png
+	uiPict[23]	= 123		!NCP_ui_text_pen.png
+	uiPict[24]	= 124		!NCP_ui_text_pen_hide.png
+	uiPict[25]	= 125		!NCP_ui_text_size.png
+	uiPict[26]	= 126		!NCP_ui_text_size_hide.png
+	uiPict[27]	= 127		!NCP_ui_text_strike.png
+	uiPict[28]	= 128		!NCP_ui_text_underline.png
+
+	uiPict[29]	= 129		!NCP_eptar_logo.png
+
+uiLink = "http://http://www.ncp.no/"
+uiLink2 = "http://www.archicadstore.com/"
+
+! ------------------------------------------------------------------------------
+! Header
+! ------------------------------------------------------------------------------
+
+ui_current_page gs_ui_current_page
+ui_page gs_ui_current_page
+
+ui_pict uiPict[15], 156, 0, 288, 33										!NCP_felsocsik.png
+ui_pict_button ui_link, "", uiPict[8], 0, 0, 158, 33, 1, uiLink			!NCP_ekornes_logo.png
+
+nTab = 1
+if need_ui_page_1 then nTab = nTab + 1
+if need_ui_page_2 then nTab = nTab + 1
+
+uiTabStyle		= 0
+uiTabMaterial	= 0
+uiTabAttributes	= 0
+
+if nTab = 3 then
+	uiTabStyle		= 1
+	uiTabMaterial	= 2
+	uiTabAttributes	= 3
+
+	if gs_ui_current_page = 1 then
+		ui_pict 						uiPict[7], 160, 33, 94, 35			!NCP_button_style_b.png
+		ui_pict_button ui_function, "", uiPict[2], 255, 33, 94, 35, 2		!NCP_button_mat_a.png
+		ui_pict_button ui_function, "", uiPict[4], 350, 33, 94, 35, 3		!NCP_button_prez_a.png
+	endif
+	if gs_ui_current_page = 2 then
+		ui_pict_button ui_function, "", uiPict[6], 160, 33, 94, 35, 1		!NCP_button_style_a.png
+		ui_pict 						uiPict[3], 255, 33, 94, 35			!NCP_button_mat_b.png
+		ui_pict_button ui_function, "", uiPict[4], 350, 33, 94, 35, 3		!NCP_button_prez_a.png
+	endif
+	if gs_ui_current_page = 3 then
+		ui_pict_button ui_function, "", uiPict[6], 160, 33, 94, 35, 1		!NCP_button_style_a.png
+		ui_pict_button ui_function, "", uiPict[2], 255, 33, 94, 35, 2		!NCP_button_mat_a.png
+		ui_pict 						uiPict[5], 350, 33, 94, 35			!NCP_button_prez_b.png
+	endif
+else
+
+endif
+
+! ------------------------------------------------------------------------------
+! Page 1	Style
+! ------------------------------------------------------------------------------
+ui_page gs_ui_current_page
+if gs_ui_current_page = 1 then
+
+! -------elválasztó---------------------
+
+	UI_SEPARATOR 160, 71, 444, 71
+	ui_pict 1, 0, 33, 159, 230	
+
+! --------------------------------------
+
+!	ui_pict uiProductPict[1], 163, 76, 280, 187
+!	ui_pict uiProductPict[2], 163, 76, 280, 187 	! eredetileg ez volt
+endif
+
+! ------------------------------------------------------------------------------
+! Page 2	Materials
+! ------------------------------------------------------------------------------
+ui_page gs_ui_current_page
+if gs_ui_current_page = 2 then
+
+! -------elválasztó---------------------
+
+	UI_SEPARATOR 160, 71, 444, 71
+	ui_pict 1, 0, 33, 159, 230	
+
+call "ncp_materials" parameters all			iElementType	= ELEMENT_TABLE,
+											iType			= TYPE_R60C,
+											uiPage			= 2
+
+endif
+
+! ------------------------------------------------------------------------------
+! Page 3	Presentation
+! ------------------------------------------------------------------------------
+ui_page gs_ui_current_page
+if gs_ui_current_page = 3 then
+
+	if uiTabAttributes > 0 then
+		ui_page uiTabAttributes
+	
+		ui_pict 1, 0, 33, 159, 218
+		ui_pict_button ui_link, "", uiPict[29], 0, 242, 159, 22, 1, uiLink2			!NCP_eptar_logo.png
+		
+	! -------elválasztó---------------------
+		UI_SEPARATOR 160, 71, 444, 71
+		UI_SEPARATOR 308, 100, 308, 215
+	
+		x1				= 180
+		x2				= 355
+		x10				= 180
+		x20				= 325
+		xInfield		= 81
+		yOutfield		= 18
+		yInfield		= 19
+		wInfield		= 40
+		pInfield		= wInfield + 5
+		wlInfield		= xInfield+30
+		wButton			= 34
+		hButton			= 23
+		buttonSpac		= 4
+		dy				= 25
+	
+		UI_OUTFIELD stAttributes[15], x10, 80, x1, 17	 	UI_TOOLTIP stAttributes[15]
+		UI_OUTFIELD stAttributes[16], x20, 80, x1, 17	 	UI_TOOLTIP stAttributes[16]
+	
+		! ------------------- Pens ---------------------------
+		y = 100
+	
+		ui_pict uiPict[9], x10, y-3, 24, 17, 1											!ui_2d_pen.png
+		ui_infield "iContPen", x10+30, y - 2, wInfield, yInfield ui_tooltip stAttributes[2]
+		ui_infield "pen_2D", x10 + 30 + pInfield, y - 2, xInfield-pInfield, yInfield ui_tooltip stAttributes[2]
+	
+		ui_pict uiPict[11], x20, y-3, 27, 17, 1											!ui_3d_pen.png
+		ui_infield "iPen3D", x20+30, y - 2, wInfield, yInfield ui_tooltip stAttributes[13]
+		ui_infield "pen_3D", x20 + 30 + pInfield, y - 2, xInfield-pInfield, yInfield ui_tooltip stAttributes[13]
+		y = y + dy
+	
+		iFlag = colored_symbol * 4
+	
+		if iFlag then
+			ui_pict uiPict[19], x10, y-3, 13, 17, 1										!ui_fill_type_lock.png
+		else
+			ui_pict uiPict[18], x10, y-3, 13, 17, 1										!ui_fill_type.png
+		endif
+		ui_infield "gs_fill_type", x10 + 30, y - 4, xInfield, 23 ui_tooltip stAttributes[3]
+	
+		ui_pict uiPict[20], x20, y-5, 30, 24, 1											!ui_resol.png
+		ui_infield "gs_resol", x20+30, y - 2, wInfield+18, yInfield ui_tooltip stAttributes[14]
+		y = y + dy
+	
+		if iFlag then
+			ui_pict uiPict[17], x10, y-3, 24, 17, 1										!ui_fill_pen_lock.png
+		else
+			ui_pict uiPict[16], x10, y-3, 24, 17, 1										!ui_fill_pen.png
+		endif
+		ui_infield "iFillPen", x10+30, y - 2, wInfield, yInfield ui_tooltip stAttributes[4]
+		ui_infield "gs_fill_pen", x10 + 30 + pInfield, y - 2, xInfield-pInfield, yInfield ui_tooltip stAttributes[4]
+	
+		ui_infield{3} "iDetLevel3D", x20, y, wlInfield, yOutfield,						!3D Detail Level
+			8, "",
+			0, 0,
+			0, 0, 0, 0,
+			0, stDetLevel3D[1], 1,
+			0, stDetLevel3D[2], 2,
+			0, stDetLevel3D[3], 3		ui_tooltip stAttributes[16]
+		y = y + dy
+	
+		ui_infield{3} "colored_symbol", x20, y, wlInfield, yOutfield,							!Really Colored
+			7, "",
+			0, 0,
+			0, 0, 0, 0,
+			0, stAttributes[1], 0,
+			0, stAttributes[1], 1
+	
+		if iFlag then
+			ui_pict uiPict[14], x10, y-3, 24, 17, 1										!ui_back_pen_lock
+		else
+			ui_pict uiPict[13], x10, y-3, 24, 17, 1										!ui_back_pen.png
+		endif
+		ui_infield "iBackPen", x10 + 30, y - 2, wInfield, yInfield ui_tooltip stAttributes[5]
+		ui_infield "gs_back_pen", x10 + 30 + pInfield, y - 2, xInfield-pInfield, yInfield ui_tooltip stAttributes[5]
+	
+	
+		! ------------------- Text ---------------------------
+		ui_infield{3} "txt_2D", x20, y + dy, wlInfield, yOutfield,									!Textbox in 2D
+			7, "",
+			0, 0,
+			0, 0, 0, 0,
+			0, stAttributes[6], 0,
+			0, stAttributes[6], 1
+		y = y + dy + 8
+
+		ui_infield{3} "iSymbolDet", x10, y-10, wlInfield, yOutfield,								!2D Symbol
+			8, "",
+			0, 0,
+			0, 0, 0, 0,
+			0, stSymbolDet[1], 1,
+			0, stSymbolDet[2], 2,
+			0, stSymbolDet[3], 3		ui_tooltip stAttributes[15]
+		y = y + 18	
+
+		iFlag = not(txt_2D) * 4
+	
+		ui_infield "font_type", x1, y-4, wlInfield+18, yInfield ui_tooltip stAttributes[9]
+		if iFlag then
+			ui_pict uiPict[26], x2-30, y-1, 24, 14, 1									!ui_text_size_hide.png
+		else
+			ui_pict uiPict[25], x2-30, y-1, 24, 14, 1									!ui_text_size.png
+		endif
+		ui_infield "font_size", x2, y-4, wInfield, yInfield		ui_tooltip stAttributes[7]
+		ui_outfield "mm", x2 + pInfield, y-2, xInfield-pInfield, yOutfield, iFlag
+		y = y + dy
+		
+		
+		ui_infield{3} "gs_text_style_bold", x1, y-6, wButton, hButton,
+			6, uiPict[21],																!ui_text_bold.png
+			1, 1,
+			16, 16, 16, 16,
+			1, "", 0,
+			1, "", 1	ui_tooltip stAttributes[10]
+		
+		ui_infield{3} "gs_text_style_italic", x1 + wButton + buttonSpac, y-6, wButton, hButton,
+			6, uiPict[22],																!ui_text_italic.png
+			1, 1,
+			16, 16, 16, 16,
+			1, "", 0,
+			1, "", 1	ui_tooltip stAttributes[11]
+		
+		ui_infield{3} "gs_text_style_underline", x1 + 2 * (wButton + buttonSpac), y-6, wButton, hButton,
+			6, uiPict[28],																!ui_text_underline.png
+			1, 1,
+			16, 16, 16, 16,
+			1, "", 0,
+			1, "", 1	ui_tooltip stAttributes[12]
+		
+		
+		if iFlag then
+			ui_pict uiPict[24], x2-30, y-3, 24, 17, 1									!ui_text_pen_hide.png
+		else
+			ui_pict uiPict[23], x2-30, y-3, 24, 17, 1									!ui_text_pen.png
+		endif
+		ui_infield "iFontPen", x2, y-4, wInfield, yInfield		ui_tooltip stAttributes[8]
+		ui_infield "font_pen", x2 + pInfield, y-4, xInfield-pInfield, yInfield		ui_tooltip stAttributes[8]
+	endif
+
+endif
+
+]]>
+</Script_UI>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_VL SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[
+! ==================================================================
+! Made by Csányi Bence
+! 2016/09
+! ==================================================================
+
+hideparameter all "a", "b", "zzyzx"
+
+call "ncp_text_label" parameters all 
+
+! -------------------------------------------------------------------------
+! Sizes
+! -------------------------------------------------------------------------
+
+parameters A = A, B = B, ZZYZX = ZZYZX
+lock "A", "B", "ZZYZX"
+parameters	ac_bottomlevel	= 0,
+			ac_toplevel		= ZZYZX
+
+! -------------------------------------------------------------------------
+! Types
+! -------------------------------------------------------------------------
+values{2} "iElementType" 	ELEMENT_CHAIR, 		`Chair`,
+							ELEMENT_SOFA,		`Sofa`,
+							ELEMENT_TABLE,		`Table`
+
+values{2} "iType" 	TYPE_CODA,					`Coda`,
+					TYPE_PUBLIC,				`Public`,
+					TYPE_PUBLICBARSTOL,			`Public Barstool`,
+					TYPE_RIO,					`Rio`,
+					TYPE_RIOBARSTOL,			`Rio Barstool`,
+					TYPE_RIOMINI,				`Rio Z Junior og Mini`,
+					TYPE_RIOJUNIOR,				`Rio Junior`,
+					TYPE_R48,					`R-48`,
+					TYPE_FAVN,					`Favn`,
+			
+					TYPE_SAMBA,					`Samba `,
+					TYPE_SAMBAJUNIOR,			`Samba junior`,
+			
+					TYPE_R60C,					`R-60c table`,
+					TYPE_NORDICLIGHT,	 		`Nordic Light table`,
+					TYPE_HUB,			 		`HUB table`,
+					TYPE_R80,			 		`R-80 table`,
+					TYPE_R100, 			 		`R-100 table`
+
+values{2} "iSymbolDet" 	1, 	`Scale sensitive`,
+						2,	`Always Simple`,
+						3,	`Always Detailed`
+
+if iElementType = ELEMENT_TABLE then 
+	lock "iType", "iChairType", "iSizeType", "iBackType", "iFeetType", "iFeetHolder", "iArmrest", "iPlastic", "iNumSeat"
+endif
+
+! -------------------------------------------------------------------------
+! Materials
+! -------------------------------------------------------------------------
+
+!call "ncp_materials" parameters 			iElementType	= ELEMENT_TABLE,
+!											iType			= TYPE_R60C
+
+! ------------------------------------------------------------------------------
+! Detail Level
+! ------------------------------------------------------------------------------
+
+values "iDetLevel3D"	DET3D_NONE,
+						DET3D_BLOCK,
+						DET3D_DETAILED
+
+values "detLevel3D" stDetLevel3D
+	
+if GLOB_MODPAR_NAME = "detLevel3D" then
+	iDetLevel3D = 1
+	for i = 2 to vardim1(stDetLevel3D)
+		if detLevel3D = stDetLevel3D[i] then
+			iDetLevel3D = i
+			i = vardim1(stDetLevel3D)
+		endif
+	next i
+	parameters iDetLevel3D = iDetLevel3D 
+else
+	iDetLevel3D = max(min(iDetLevel3D,vardim1(stDetLevel3D)),1)
+	parameters detLevel3D = stDetLevel3D[iDetLevel3D]
+endif
+
+! -------------------------------------------------------------------------
+! UI
+! -------------------------------------------------------------------------
+
+if need_ui_page_1 then put 1
+if need_ui_page_2 then put 2
+put 3
+values "gs_ui_current_page" get(nsp)
+
+if not(need_ui_page_1) and gs_ui_current_page = 1 then
+	parameters gs_ui_current_page = 2
+endif
+
+if not(need_ui_page_2) and gs_ui_current_page = 2 then
+	parameters gs_ui_current_page = 3
+endif
+
+if GLOB_UI_BUTTON_ID = 1 then parameters gs_ui_current_page = 1
+if GLOB_UI_BUTTON_ID = 2 then parameters gs_ui_current_page = 2
+if GLOB_UI_BUTTON_ID = 3 then parameters gs_ui_current_page = 3
+
+! ------------------------------------------------------------------------------
+! 2D, 3D Representation
+! ------------------------------------------------------------------------------
+if GLOB_CONTEXT = 1 | GLOB_CONTEXT = 5 then
+	for i = 1 to 255
+		put i
+	next i
+
+	values "gs_resol"		range	[36,]
+	values "pen_2D"			use(nsp)
+	values "gs_fill_pen"	use(nsp)
+	values "pen_3D"			get(nsp)
+
+	if GLOB_MODPAR_NAME = "iContPen" then
+		iContPen	= min(max(iContPen, 1), 255)
+		pen_2D		= iContPen
+		parameters iContPen = iContPen, pen_2D = pen_2D
+	else
+		pen_2D		= max(pen_2D, 1)
+		iContPen	= pen_2D
+		parameters iContPen = iContPen, pen_2D = pen_2D
+	endif
+
+	if GLOB_MODPAR_NAME = "iFillPen" then
+		iFillPen	= min(max(iFillPen, 1), 255)
+		gs_fill_pen	= iFillPen
+		parameters iFillPen = iFillPen, gs_fill_pen = gs_fill_pen
+	else
+		gs_fill_pen	= max(gs_fill_pen, 1)
+		iFillPen	= gs_fill_pen
+		parameters iFillPen = iFillPen, gs_fill_pen = gs_fill_pen
+	endif
+
+	if GLOB_MODPAR_NAME = "iBackPen" then
+		iBackPen	= min(max(iBackPen, -1), 255)
+		gs_back_pen	= iBackPen
+		parameters iBackPen = iBackPen, gs_back_pen = gs_back_pen
+	else
+		gs_back_pen	= max(gs_back_pen, -1)
+		iBackPen	= gs_back_pen
+		parameters iBackPen = iBackPen, gs_back_pen = gs_back_pen
+	endif
+
+	if GLOB_MODPAR_NAME = "iPen3D" then
+		iPen3D	= min(max(iPen3D, 1), 255)
+		pen_3D	= iPen3D
+		parameters iPen3D = iPen3D, pen_3D = pen_3D
+	else
+		pen_3D	= max(pen_3D, 1)
+		iPen3D	= pen_3D
+		parameters iPen3D = iPen3D, pen_3D = pen_3D
+	endif
+
+	if colored_symbol then
+		hideparameter	"gs_fill_type",
+						"gs_fill_pen",
+						"iFillPen",
+						"gs_back_pen",
+						"iBackPen"
+
+		lock			"gs_fill_type",
+						"gs_fill_pen",
+						"iFillPen",
+						"gs_back_pen",
+						"iBackPen"
+	endif
+endif
+
+
+]]>
+</Script_VL>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Comment SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Comment>
+
+<ParamSection SectVersion="22" SectionFlags="0" SubIdent="0">
+	<ParamSectHeader>
+		<Version>22</Version>
+		<AutoHotspots>no</AutoHotspots>
+		<StatBits>
+			<STBit_FixSize/>
+		</StatBits>
+		<WDLeftFrame>0</WDLeftFrame>
+		<WDRightFrame>0</WDRightFrame>
+		<WDTopFrame>0</WDTopFrame>
+		<WDBotFrame>0</WDBotFrame>
+		<LayFlags>65535</LayFlags>
+		<WDMirrorThickness>0</WDMirrorThickness>
+		<WDWallInset>0</WDWallInset>
+		<SymbolColor>0</SymbolColor>
+	</ParamSectHeader>
+	<Parameters>
+		<Length Name="A">
+			<Description><![CDATA["A"]]></Description>
+			<Fix/>
+			<Value>0.9</Value>
+		</Length>
+		<Length Name="B">
+			<Description><![CDATA["B"]]></Description>
+			<Fix/>
+			<Value>0.9</Value>
+		</Length>
+		<Length Name="ZZYZX">
+			<Description><![CDATA["Height"]]></Description>
+			<Fix/>
+			<Value>0.44</Value>
+		</Length>
+		<Boolean Name="AC_show2DHotspotsIn3D">
+			<Description><![CDATA["2D hotspots in 3D"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Length Name="ac_bottomlevel">
+			<Description><![CDATA["Bottom level"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Length Name="ac_toplevel">
+			<Description><![CDATA["Top level"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0.44</Value>
+		</Length>
+		<Integer Name="iElementType">
+			<Description><![CDATA["Element Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>3</Value>
+		</Integer>
+		<Integer Name="iType">
+			<Description><![CDATA["Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>31</Value>
+		</Integer>
+		<Integer Name="iChairType">
+			<Description><![CDATA["ChairType"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iSizeType">
+			<Description><![CDATA["Size Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iBackType">
+			<Description><![CDATA["Back Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iFeetType">
+			<Description><![CDATA["Feet Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iFeetHolder">
+			<Description><![CDATA["Feetholder"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iArmRest">
+			<Description><![CDATA["Armrest"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iPlastic">
+			<Description><![CDATA["Plastic"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="iNumSeat">
+			<Description><![CDATA["No. of Seat"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- iUpholsteryType: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="iUpholsteryType">
+			<Description><![CDATA["Upholstery Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="UpholsteryType">
+			<Description><![CDATA["Upholstery Type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Leather"]]></Value>
+		</String>
+		<Integer Name="iLeatherType">
+			<Description><![CDATA["LeatherType"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<String Name="LeatherType">
+			<Description><![CDATA[""]]></Description>
+			<Value><![CDATA["93 Batick"]]></Value>
+		</String>
+		<Integer Name="iTextileType">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>10</Value>
+		</Integer>
+		<String Name="TextileType">
+			<Description><![CDATA[""]]></Description>
+			<Value><![CDATA["550 Dinamica"]]></Value>
+		</String>
+		<Integer Name="iPlasticType">
+			<Description><![CDATA["Plastic Type"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<String Name="PlasticType">
+			<Description><![CDATA[""]]></Description>
+			<Value><![CDATA[""]]></Value>
+		</String>
+
+		<!-- uiPage: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Integer Name="uiPage">
+			<Description><![CDATA["UI page"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="uiYStart">
+			<Description><![CDATA["UI y Start"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+		<Integer Name="uiXStart">
+			<Description><![CDATA["UI X Start"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>80</Value>
+		</Integer>
+		<Integer Name="uiXEnd">
+			<Description><![CDATA["UI X End"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>120</Value>
+		</Integer>
+
+		<!-- mat: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="mat">
+			<Description><![CDATA["Material Generator"]]></Description>
+		</Title>
+		<Integer Name="matNumber">
+			<Description><![CDATA["Material Number"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Integer>
+
+		<!-- materials: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="materials">
+			<Description><![CDATA["Materials"]]></Description>
+		</Title>
+		<String Name="matBack">
+			<Description><![CDATA["Back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["85 Brown"]]></Value>
+		</String>
+		<Material Name="customMatBack">
+			<Description><![CDATA["Custom back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>30</Value>
+		</Material>
+		<Integer Name="iMatBack">
+			<Description><![CDATA["Back material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Integer Name="backMatArray">
+			<Description><![CDATA["Back Material Array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="10" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">7</AVal>
+				<AVal Row="8">8</AVal>
+				<AVal Row="9">9</AVal>
+				<AVal Row="10">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matSeat">
+			<Description><![CDATA["Seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["85 Brown"]]></Value>
+		</String>
+		<Material Name="customMatSeat">
+			<Description><![CDATA["Custom seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>75</Value>
+		</Material>
+		<Integer Name="iMatSeat">
+			<Description><![CDATA["Seat material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>9</Value>
+		</Integer>
+		<Integer Name="seatMatArray">
+			<Description><![CDATA["Seat material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="10" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">7</AVal>
+				<AVal Row="8">8</AVal>
+				<AVal Row="9">9</AVal>
+				<AVal Row="10">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matArm">
+			<Description><![CDATA["Arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["85 Brown"]]></Value>
+		</String>
+		<Material Name="customMatArm">
+			<Description><![CDATA["Custom arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>20</Value>
+		</Material>
+		<Integer Name="iMatArm">
+			<Description><![CDATA["Arm material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>9</Value>
+		</Integer>
+		<Integer Name="armMatArray">
+			<Description><![CDATA["Arm material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="10" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">7</AVal>
+				<AVal Row="8">8</AVal>
+				<AVal Row="9">9</AVal>
+				<AVal Row="10">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matPlastic">
+			<Description><![CDATA["Plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["19 Black"]]></Value>
+		</String>
+		<Material Name="customMatPlastic">
+			<Description><![CDATA["Custom plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Material>
+		<Integer Name="iMatPlastic">
+			<Description><![CDATA["Plastic material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>5</Value>
+		</Integer>
+		<Integer Name="plasticMatArray">
+			<Description><![CDATA["Plastic material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="10" SecondDimension="0">
+				<AVal Row="1">1</AVal>
+				<AVal Row="2">2</AVal>
+				<AVal Row="3">3</AVal>
+				<AVal Row="4">4</AVal>
+				<AVal Row="5">5</AVal>
+				<AVal Row="6">6</AVal>
+				<AVal Row="7">7</AVal>
+				<AVal Row="8">8</AVal>
+				<AVal Row="9">9</AVal>
+				<AVal Row="10">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matWood">
+			<Description><![CDATA["Wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Wenge"]]></Value>
+		</String>
+		<Material Name="customMatWood">
+			<Description><![CDATA["Custom wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>52</Value>
+		</Material>
+		<Integer Name="iMatWood">
+			<Description><![CDATA["Wood material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>48</Value>
+		</Integer>
+		<Integer Name="woodMatArray">
+			<Description><![CDATA["Wood material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="8" SecondDimension="0">
+				<AVal Row="1">48</AVal>
+				<AVal Row="2">49</AVal>
+				<AVal Row="3">50</AVal>
+				<AVal Row="4">51</AVal>
+				<AVal Row="5">52</AVal>
+				<AVal Row="6">53</AVal>
+				<AVal Row="7">54</AVal>
+				<AVal Row="8">0</AVal>
+			</ArrayValues>
+		</Integer>
+		<String Name="matSteel">
+			<Description><![CDATA["Steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Chrome"]]></Value>
+		</String>
+		<Material Name="customMatSteel">
+			<Description><![CDATA["Custom steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>52</Value>
+		</Material>
+		<Integer Name="iMatSteel">
+			<Description><![CDATA["Steel material"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>130</Value>
+		</Integer>
+		<Integer Name="steelMatArray">
+			<Description><![CDATA["Steel material array"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<ArrayValues FirstDimension="2" SecondDimension="0">
+				<AVal Row="1">130</AVal>
+				<AVal Row="2">0</AVal>
+			</ArrayValues>
+		</Integer>
+
+		<!-- gs_2D_representation: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="gs_2D_representation">
+			<Description><![CDATA["2D Representation"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<PenColor Name="pen_2D">
+			<Description><![CDATA["Contour Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</PenColor>
+		<Integer Name="iContPen">
+			<Description><![CDATA["Contour Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<Boolean Name="colored_symbol">
+			<Description><![CDATA["Realistic Colours on Symbol"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<FillPattern Name="gs_fill_type">
+			<Description><![CDATA["Fill Type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>65</Value>
+		</FillPattern>
+		<PenColor Name="gs_fill_pen">
+			<Description><![CDATA["Fill Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>19</Value>
+		</PenColor>
+		<Integer Name="iFillPen">
+			<Description><![CDATA["Fill Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>19</Value>
+		</Integer>
+		<PenColor Name="gs_back_pen">
+			<Description><![CDATA["Background Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>19</Value>
+		</PenColor>
+		<Integer Name="iBackPen">
+			<Description><![CDATA["Background Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>19</Value>
+		</Integer>
+		<Integer Name="iSymbolDet">
+			<Description><![CDATA["2d Symbol Detail"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+
+		<!-- gs_3D_representation: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="gs_3D_representation">
+			<Description><![CDATA["3D Representation"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+		</Title>
+		<PenColor Name="pen_3D">
+			<Description><![CDATA["3D Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</PenColor>
+		<Integer Name="iPen3D">
+			<Description><![CDATA["3D Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<Integer Name="gs_resol">
+			<Description><![CDATA["Resolution"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>36</Value>
+		</Integer>
+		<Boolean Name="gs_shadow">
+			<Description><![CDATA["Shadow"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<String Name="detLevel3D">
+			<Description><![CDATA["Detail level 3D"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Detailed"]]></Value>
+		</String>
+		<Integer Name="iDetLevel3D">
+			<Description><![CDATA["Detail level 3D"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>3</Value>
+		</Integer>
+
+		<!-- txt_2D: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Boolean Name="txt_2D">
+			<Description><![CDATA["Show 2D text"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<String Name="font_type">
+			<Description><![CDATA["Font type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Arial"]]></Value>
+		</String>
+		<String Name="font_style">
+			<Description><![CDATA["Font style"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Converted"]]></Value>
+		</String>
+		<PenColor Name="font_pen">
+			<Description><![CDATA["Font pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>6</Value>
+		</PenColor>
+		<Integer Name="iFontPen">
+			<Description><![CDATA["Font pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>6</Value>
+		</Integer>
+		<RealNum Name="font_size">
+			<Description><![CDATA["Font size (in mm)"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</RealNum>
+		<Boolean Name="gs_text_style_bold">
+			<Description><![CDATA["Bold"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="gs_text_style_italic">
+			<Description><![CDATA["Italic"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="gs_text_style_underline">
+			<Description><![CDATA["Underline"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Length Name="hota">
+			<Description><![CDATA["2D text x coordinate"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Length Name="hotb">
+			<Description><![CDATA["2D text y coordinate"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>-0.6</Value>
+		</Length>
+		<Angle Name="angle">
+			<Description><![CDATA["2D text angle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Angle>
+
+		<!-- UI: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Title Name="UI">
+			<Description><![CDATA["UI"]]></Description>
+		</Title>
+		<Integer Name="gs_ui_current_page">
+			<Description><![CDATA[""]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Integer>
+		<Boolean Name="need_ui_page_1">
+			<Description><![CDATA["Need Ui Page 1"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Boolean Name="need_ui_page_2">
+			<Description><![CDATA["Need Ui Page 2"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+	</Parameters>
+</ParamSection>
+
+<Picture MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="0" path="prevpict/NCP_r-100.png">
+</Picture>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="1" path="ui_productPict/ui_r-100_type_1.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="101" path="y_ui_picts/general/NCP_background.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="102" path="y_ui_picts/general/NCP_button_mat_a.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="103" path="y_ui_picts/general/NCP_button_mat_b.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="104" path="y_ui_picts/general/NCP_button_prez_a.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="105" path="y_ui_picts/general/NCP_button_prez_b.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="106" path="y_ui_picts/general/NCP_button_style_a.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="107" path="y_ui_picts/general/NCP_button_style_b.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="108" path="y_ui_picts/general/NCP_ekornes_logo.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="109" path="y_ui_picts/general/NCP_ui_2d_pen.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="110" path="y_ui_picts/general/NCP_ui_2d_pen_lock.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="111" path="y_ui_picts/general/NCP_ui_3d_pen.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="112" path="y_ui_picts/general/NCP_ui_3d_pen_lock.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="113" path="y_ui_picts/general/NCP_ui_back_pen.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="114" path="y_ui_picts/general/NCP_ui_back_pen_lock.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="115" path="y_ui_picts/general/NCP_felsocsik.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="116" path="y_ui_picts/general/NCP_ui_fill_pen.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="117" path="y_ui_picts/general/NCP_ui_fill_pen_lock.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="118" path="y_ui_picts/general/NCP_ui_fill_type.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="119" path="y_ui_picts/general/NCP_ui_fill_type_lock.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="120" path="y_ui_picts/general/NCP_ui_resol.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="121" path="y_ui_picts/general/NCP_ui_text_bold.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="122" path="y_ui_picts/general/NCP_ui_text_italic.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="123" path="y_ui_picts/general/NCP_ui_text_pen.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="124" path="y_ui_picts/general/NCP_ui_text_pen_hide.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="125" path="y_ui_picts/general/NCP_ui_text_size.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="126" path="y_ui_picts/general/NCP_ui_text_size_hide.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="127" path="y_ui_picts/general/NCP_ui_text_strike.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="128" path="y_ui_picts/general/NCP_ui_text_underline.png">
+</GDLPict>
+
+<GDLPict MIME="image/png" SectVersion="19" SectionFlags="0" SubIdent="129" path="y_ui_picts/general/NCP_eptar_logo.png">
+</GDLPict>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_FWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_FWM>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_BWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_BWM>
+
+<Copyright SectVersion="1" SectionFlags="0" SubIdent="0">
+	<Author>Éptár Kft. - Csányi Bence</Author>
+	<License>
+		<Type>Commercial</Type>
+		<Version></Version>
+	</License>
+</Copyright>
+
+<Keywords SectVersion="1" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Keywords>
+
+</Symbol>

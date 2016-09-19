@@ -1,0 +1,501 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Symbol IsArchivable="no" IsPlaceable="no" MainGUID="FD7E2734-952A-487F-A02A-243896579B0C" MigrationValue="Normal" Owner="1196638531" Signature="1196644685" Version="34">
+<Ancestry SectVersion="1" SectionFlags="0" SubIdent="0" Template="no">
+	<MainGUID>F938E33A-329D-4A36-BE3E-85E126820996</MainGUID>
+	<MainGUID>103E8D2C-8230-42E1-9597-46F84CCE28C0</MainGUID>
+	<MainGUID>B2970E4C-8680-4061-8670-2F4B638F3953</MainGUID>
+</Ancestry>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_3D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_3D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_2D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[! ==============================================================================
+! General Settings
+! ==============================================================================
+if not(txt_2D) then end
+unID = 1000
+pen font_pen
+
+! ==============================================================================
+! Text Extension
+! ==============================================================================
+num	= 0
+if (txt_1 <> "") then
+	num			= num + 1
+	firstChar	= strsub(txt_1,1,1)
+	lastchar	= strsub(txt_1,strlen(txt_1)-1,1)
+	if firstChar <> " " then txt_1 = " " + txt_1
+	if lastchar  <> " " then txt_1 = txt_1 + " "
+endif
+if (txt_2 <> "") then
+	num			= num + 1
+	firstChar	= strsub(txt_2,1,1)
+	lastchar	= strsub(txt_2,strlen(txt_2)-1,1)
+	if firstChar <> " " then txt_2 = " " + txt_2
+	if lastchar  <> " " then txt_2 = txt_2 + " "
+endif
+if (txt_3 <> "") then
+	num			= num + 1
+	firstChar	= strsub(txt_3,1,1)
+	lastchar	= strsub(txt_3,strlen(txt_3)-1,1)
+	if firstChar <> " " then txt_3 = " " + txt_3
+	if lastchar  <> " " then txt_3 = txt_3 + " "
+endif
+if (txt_4 <> "") then
+	num			= num + 1
+	firstChar	= strsub(txt_4,1,1)
+	lastchar	= strsub(txt_4,strlen(txt_4)-1,1)
+	if firstChar <> " " then txt_4 = " " + txt_4
+	if lastchar  <> " " then txt_4 = txt_4 + " "
+endif
+if (txt_5 <> "") then
+	num			= num + 1
+	firstChar	= strsub(txt_5,1,1)
+	lastchar	= strsub(txt_5,strlen(txt_5)-1,1)
+	if firstChar <> " " then txt_5 = " " + txt_5
+	if lastchar  <> " " then txt_5 = txt_5 + " "
+endif
+
+
+! ==============================================================================
+! Style
+! ==============================================================================
+
+define style "styleID" font_type, font_size, 1+2*SYMB_MIRRORED, gs_text_style_bold + 2*gs_text_style_italic + 4*gs_text_style_underline
+set style "styleID"
+
+textH = 0
+qq = request("Height_of_style", "styleID", _h, _descent, _leading)
+if qq then textH = _h * paperToModel
+
+szel_1 = stw (txt_1) * paperToModel
+szel_2 = stw (txt_2) * paperToModel
+szel_3 = stw (txt_3) * paperToModel
+szel_4 = stw (txt_4) * paperToModel
+szel_5 = stw (txt_5) * paperToModel
+szel = max(szel_1, szel_2, szel_3, szel_4, szel_5)
+
+
+! ==============================================================================
+! Oriented View
+! ==============================================================================
+angleViewRot 	= 0
+readAngle 		= 90
+iMirrored		= 1-(2*SYMB_MIRRORED)
+qqq = request ("View_Rotangle", "", angleViewRot)
+totalRotate	 	= (SYMB_ROTANGLE + angleViewRot + angle) MOD 360
+bTextRotate		= (totalRotate  > (readAngle + eps*iMirrored) & totalRotate  < (readAngle + 180 + eps*iMirrored))
+textRotate		= 180 * bTextRotate
+
+
+! ==============================================================================
+! Hotspots
+! ==============================================================================
+hotspot2 hota,	 0,		unID, hotb, 1+128	: unID = unID + 1
+hotspot2 hota,	-1,		unID, hotb, 3		: unID = unID + 1
+hotspot2 hota,	hotb,	unID, hotb, 2		: unID = unID + 1
+
+hotspot2  0,	hotb,	unID, hota, 1+128	: unID = unID + 1
+hotspot2 -1,	hotb,	unID, hota, 3		: unID = unID + 1
+hotspot2 hota,	hotb,	unID, hota, 2		: unID = unID + 1
+
+add2 hota,hotb
+rot2 textRotate
+
+hotspot2 0,					0,					unID, angle, 6		: unID = unID + 1
+hotspot2 szel/2,			0,					unID, angle, 4+128	: unID = unID + 1
+hotspot2 szel/2*cos(angle),	szel/2*sin(angle),	unID, angle, 5		: unID = unID + 1
+
+rot2 angle
+
+
+! ==============================================================================
+! Text
+! ==============================================================================
+add2 -szel/2, 0
+
+if num > 0 then
+	add2 SYMB_MIRRORED*szel, 0
+	y = textH*num*bTextRotate
+
+	if (txt_1 <> "") then
+		text2 0, y, txt_1
+		y = y - textH
+	endif
+	if (txt_2 <> "") then
+		text2 0, y, txt_2
+		y = y - textH
+	endif
+	if (txt_3 <> "") then
+		text2 0, y, txt_3
+		y = y - textH
+	endif
+	if (txt_4 <> "") then
+		text2 0, y, txt_4
+		y = y - textH
+	endif
+	if (txt_5 <> "") then
+		text2 0, y, txt_5
+	endif
+	del 1
+	
+	if abs(szel) > EPS & abs(-textH*num*(1-2*(bTextRotate))) > EPS then
+		rect2 0,0,szel,-textH*num*(1-2*(bTextRotate))
+	endif
+endif
+
+del 4
+
+]]>
+</Script_2D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_1D SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[eps = 0.0001
+paperToModel = GLOB_SCALE / 1000
+modelToPaper = 1000 / GLOB_SCALE
+
+! ==============================================================================
+! Old parameters conversion
+! ==============================================================================
+dim font_style_mtr[4]
+	font_style_mtr[1]=`Regular`
+	font_style_mtr[2]=`Bold`
+	font_style_mtr[3]=`Italic`
+	font_style_mtr[4]=`Converted`
+
+if font_style <> font_style_mtr[4] then
+	font_size	= font_size*100/GLOB_SCALE
+
+	gs_text_style_bold 		= 0
+	gs_text_style_italic	= 0
+	gs_text_style_underline	= 0
+
+	if font_style = font_style_mtr[2] then gs_text_style_bold	= 1
+	if font_style = font_style_mtr[3] then gs_text_style_italic	= 1
+
+	parameters	font_size				= font_size,
+				font_style				= font_style_mtr[4],
+				gs_text_style_bold 		= gs_text_style_bold,
+				gs_text_style_italic	= gs_text_style_italic,
+				gs_text_style_underline	= gs_text_style_underline
+
+	!TODO eseteleg pozicio migráció
+endif
+
+
+]]>
+</Script_1D>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_PR SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_PR>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_UI SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_UI>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_VL SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[if GLOB_CONTEXT = 5 | GLOB_CONTEXT = 1 then
+
+	! ==============================================================================
+	! Text Style
+	! ==============================================================================
+	dim fontNames[]
+	n = request("FONTNAMES_LIST", "", fontNames)
+	values "font_type" fontNames, custom
+	
+	if font_size < 0.1 then
+		font_size = 1.0
+		parameters	font_size = font_size
+	endif
+	
+	if GLOB_MODPAR_NAME = "iFontPen" then
+		iFontPen	= min(max(iFontPen, 1), 255)
+		font_pen	= iFontPen
+		parameters iFontPen = iFontPen, font_pen = font_pen
+	else
+		font_pen	= max(font_pen, 1)
+		iFontPen	= font_pen
+		parameters iFontPen = iFontPen, font_pen = font_pen
+	endif
+	
+	! ==============================================================================
+	! Hide parameters
+	! ==============================================================================
+	if not(txt_2D) then
+		hideparameter	"font_type",
+						"font_style",
+						"font_pen",
+						"iFontPen",
+						"font_size",
+						"gs_text_style_bold",
+						"gs_text_style_italic",
+						"gs_text_style_underline",
+						"hota",
+						"hotb",
+						"angle"
+						!"txt_1",
+						!"txt_2",
+						!"txt_3",
+						!"txt_4",
+						!"txt_5"
+	
+		lock			"font_type",
+						"font_style",
+						"font_pen",
+						"iFontPen",
+						"font_size",
+						"gs_text_style_bold",
+						"gs_text_style_italic",
+						"gs_text_style_underline",
+						"hota",
+						"hotb",
+						"angle"
+						!"txt_1",
+						!"txt_2",
+						!"txt_3",
+						!"txt_4",
+						!"txt_5"
+	endif
+
+endif]]>
+</Script_VL>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Comment SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Comment>
+
+<ParamSection SectVersion="22" SectionFlags="0" SubIdent="0">
+	<ParamSectHeader>
+		<Version>22</Version>
+		<AutoHotspots>no</AutoHotspots>
+		<StatBits>
+			<STBit_FixSize/>
+		</StatBits>
+		<WDLeftFrame>0</WDLeftFrame>
+		<WDRightFrame>0</WDRightFrame>
+		<WDTopFrame>0</WDTopFrame>
+		<WDBotFrame>0</WDBotFrame>
+		<LayFlags>65535</LayFlags>
+		<WDMirrorThickness>0</WDMirrorThickness>
+		<WDWallInset>0</WDWallInset>
+		<SymbolColor>0</SymbolColor>
+	</ParamSectHeader>
+	<Parameters>
+		<Length Name="A">
+			<Description><![CDATA["X Dimension"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Length Name="B">
+			<Description><![CDATA["Y Dimension"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Length Name="ZZYZX">
+			<Description><![CDATA["Z Dimension"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Boolean Name="AC_show2DHotspotsIn3D">
+			<Description><![CDATA["Show 2D Hotspots in 3D"]]></Description>
+			<Fix/>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<Length Name="ac_bottomlevel">
+			<Description><![CDATA["Alsó szint"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>1</Value>
+		</Length>
+		<Length Name="ac_toplevel">
+			<Description><![CDATA["Felső szint"]]></Description>
+			<Flags>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+
+		<!-- txt_2D: PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK ===== PARAMETER BLOCK -->
+
+		<Boolean Name="txt_2D">
+			<Description><![CDATA["2D text"]]></Description>
+			<Flags>
+				<ParFlg_BoldName/>
+			</Flags>
+			<Value>1</Value>
+		</Boolean>
+		<String Name="font_type">
+			<Description><![CDATA["Font type"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA["Arial"]]></Value>
+		</String>
+		<String Name="font_style">
+			<Description><![CDATA["Font style"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value><![CDATA["Converted"]]></Value>
+		</String>
+		<PenColor Name="font_pen">
+			<Description><![CDATA["Font Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>2</Value>
+		</PenColor>
+		<Integer Name="iFontPen">
+			<Description><![CDATA["Font Pen"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+				<ParFlg_Hidden/>
+			</Flags>
+			<Value>2</Value>
+		</Integer>
+		<RealNum Name="font_size">
+			<Description><![CDATA["Font Size (in mm)"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>1</Value>
+		</RealNum>
+		<Boolean Name="gs_text_style_bold">
+			<Description><![CDATA["Bold"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="gs_text_style_italic">
+			<Description><![CDATA["Italic"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Boolean Name="gs_text_style_underline">
+			<Description><![CDATA["Underline"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Boolean>
+		<Length Name="hota">
+			<Description><![CDATA["2D text x coordinate"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Length Name="hotb">
+			<Description><![CDATA["2D text y coordinate"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Length>
+		<Angle Name="angle">
+			<Description><![CDATA["2D text angle"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value>0</Value>
+		</Angle>
+		<String Name="txt_1">
+			<Description><![CDATA["Text Row #1"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA[""]]></Value>
+		</String>
+		<String Name="txt_2">
+			<Description><![CDATA["Text Row #2"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA[""]]></Value>
+		</String>
+		<String Name="txt_3">
+			<Description><![CDATA["Text Row #3"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA[""]]></Value>
+		</String>
+		<String Name="txt_4">
+			<Description><![CDATA["Text Row #4"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA[""]]></Value>
+		</String>
+		<String Name="txt_5">
+			<Description><![CDATA["Text Row #5"]]></Description>
+			<Flags>
+				<ParFlg_Child/>
+			</Flags>
+			<Value><![CDATA[""]]></Value>
+		</String>
+	</Parameters>
+</ParamSection>
+
+<CalledMacros SectVersion="2" SectionFlags="0" SubIdent="0">
+</CalledMacros>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_FWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_FWM>
+
+<!-- GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT ===== GDL SCRIPT -->
+
+<Script_BWM SectVersion="20" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Script_BWM>
+
+<Copyright SectVersion="1" SectionFlags="0" SubIdent="0">
+	<Author></Author>
+	<License>
+		<Type>Commercial</Type>
+		<Version></Version>
+	</License>
+</Copyright>
+
+<Keywords SectVersion="1" SectionFlags="0" SubIdent="0">
+<![CDATA[]]>
+</Keywords>
+
+</Symbol>
